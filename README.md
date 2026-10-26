@@ -3,10 +3,10 @@
 Private shared calendar for Nora and Anant. Installable web app (PWA) for iPhone, iPad, Android tablet and laptop. Live at <https://ourtings.noratikachung.com>.
 
 - Opening the link in a browser shows a Hollow Knight–style welcome: Hornet asks you to touch the glowing butterfly; tapping it opens the install prompt where the browser supports one (Android/desktop Chrome, Edge) and reveals a glowing garden with that device's install steps (Apple doesn't allow a button to install, so iPhone/iPad get the Add to Home Screen steps). A faint × skips to the app. The installed app never shows the welcome.
-- Unlock each device once with a shared secret code, then tap your icon (little white Totoro/Hornet = Nora, big Totoro/Knight = Anant). You stay that user until **Log out**.
+- Unlock each device once with a shared secret code, then tap your icon (white elf/Hornet = Nora, Totoro/Knight = Anant). You stay that user until **Log out**.
 - Day / week / month / year views. Show or hide each person's calendar; the toggles and last view are remembered per user on each device.
 - Events (name, notes, place, date & time, all-day) and yearly birthdays, shown as sticky notes in the owner's colour. Anyone can comment.
-- Dark (Hollow Knight–style) is the default theme; light (Studio Ghibli–style: Howl's-like landscape with Totoro) is the alternative, via the sun/moon button and remembered per device.
+- Dark (Hollow Knight–style) is the default theme; light (Studio Ghibli–style: Howl's castle valley with drifting mist, Totoro flying about and the white elf toddling along the bottom) is the alternative, via the sun/moon button and remembered per device.
 - Changes sync live between devices and work offline (they upload when back online).
 
 ## Stack (all free tiers)
@@ -69,4 +69,4 @@ Node 24. `npm ci`, then:
 - **Push notifications** when the other person adds an event: web-push with VAPID keys from a Vercel function. On iPhone/iPad this needs the Home Screen app (iOS 16.4+).
 
 ## Artwork
-Illustrations (Totoro-style and Knight/Hornet-style avatars, both animated landscapes, the welcome scenery) are original SVGs in `src/art/`. The welcome page's Hornet and Knight are official Hollow Knight character pictures supplied by the user (`assets/characters/`, trimmed and mirrored copies in `src/art/welcome/`). The app icon is the user's bunny picture (`assets/icons/`): `public/icon.png` is that bunny on a transparent square, rendered on black for iPhone/iPad and Android and kept transparent elsewhere (`npm run icons`). Totoro and Howl's Moving Castle belong to Studio Ghibli and Hollow Knight to Team Cherry; this is a private, non-commercial project, so keep the repository private.
+The dark landscape, the welcome scenery and the cavern frame and cloaks of the dark avatars are original SVGs in `src/art/`. Pictures supplied by the user (originals in `assets/`, prepared copies in `src/art/`): the welcome page's Hornet and Knight (`welcome/`, trimmed and mirrored); the avatar pictures (`avatar/`: Hornet and Knight masks trimmed, Totoro badge cut to its circle, white elf); the light theme's valley background, flying Totoro and white elf (`ghibli/`; the background is only 720×405, so it looks soft on big screens). The app icon is the user's bunny picture (`assets/icons/`): `public/icon.png` is that bunny on a transparent square, rendered on black for iPhone/iPad and Android and kept transparent elsewhere (`npm run icons`). Totoro and Howl's Moving Castle belong to Studio Ghibli and Hollow Knight to Team Cherry; this is a private, non-commercial project, so keep the repository private.

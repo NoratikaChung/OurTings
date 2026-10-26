@@ -20,128 +20,131 @@
 /* ---------- light ---------- */
 
 .scenery-light {
-  --scenery-near: clamp(200px, max(30vh, 24vw), 460px);
-  background: linear-gradient(to bottom, #3e8fd0 0%, #63a9df 28%, #8cc6ec 48%, #d8eef8 72%, #d8eef8 100%);
+  --grass: clamp(110px, 20vh, 240px);
+  background: #8cc6ec;
 }
 
-.scenery-cumulus {
+/* Blurred copy of the picture filling the sides on screens wider than 16:9. */
+.scenery-photo-fill {
   position: absolute;
-  height: auto;
-  animation: scenery-drift 70s ease-in-out infinite alternate;
-}
-
-.scenery-bird {
-  position: absolute;
-  left: -8vw;
-  animation: scenery-cross 50s linear infinite;
-}
-
-.scenery-bird-wings {
+  inset: 0;
   width: 100%;
-  height: auto;
-  transform-origin: 50% 60%;
-  animation: scenery-wingbeat 0.7s ease-in-out infinite alternate;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(24px);
+  transform: scale(1.1);
 }
 
-.scenery-far {
-  height: clamp(380px, max(68vh, 46vw), 900px);
-}
-
-/* The castle stands behind the near hill so its feet sink just below the ridge at every size. */
-.scenery-castle {
+/* The 16:9 picture fills the screen's height. --focus is the point of the picture kept in view: 40% shows the castle
+   on tablets and laptops; phones show the right side (snowy mountain and the sheep). The mist lives in the same
+   box, so it stays on the same spot of the picture. */
+.scenery-photo {
+  --focus: 40%;
   position: absolute;
-  left: clamp(4px, 7vw, 140px);
-  bottom: calc(var(--scenery-near) * 0.66);
-  width: clamp(120px, 19vw, 290px);
+  top: 0;
+  left: var(--focus);
+  height: 100%;
+  aspect-ratio: 16 / 9;
+  transform: translateX(calc(var(--focus) * -1));
 }
 
-.scenery-castle-body {
+@media (max-width: 600px) {
+  .scenery-photo {
+    --focus: 85%;
+  }
+}
+
+.scenery-photo img {
+  display: block;
   width: 100%;
-  height: auto;
-  transform-origin: 50% 100%;
-  animation: scenery-walk 2.6s ease-in-out infinite;
+  height: 100%;
 }
 
-.scenery-smoke {
+.scenery-mist {
   position: absolute;
-  width: 17%;
-  aspect-ratio: 1;
+  aspect-ratio: 2 / 1;
   border-radius: 50%;
-  background: radial-gradient(circle at 45% 40%, rgba(96, 96, 96, 0.85) 0%, rgba(74, 74, 74, 0.7) 45%, rgba(74, 74, 74, 0) 70%);
-  opacity: 0;
-  animation: scenery-smoke 7s ease-out infinite;
+  background: radial-gradient(closest-side, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.45) 55%, rgba(255, 255, 255, 0));
+  opacity: 0.6;
+  animation: scenery-mist 44s ease-in-out infinite alternate;
 }
 
-.scenery-near {
-  height: var(--scenery-near);
+.scenery-cloud {
+  position: absolute;
+  left: 0;
+  width: clamp(220px, 55vw, 760px);
+  aspect-ratio: 3 / 1;
+  background:
+    radial-gradient(closest-side, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0)) 0% 80% / 45% 70% no-repeat,
+    radial-gradient(closest-side, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0)) 50% 20% / 55% 95% no-repeat,
+    radial-gradient(closest-side, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0)) 100% 80% / 45% 70% no-repeat;
+  opacity: 0.85;
+  animation: scenery-drift 200s linear infinite;
 }
 
-.scenery-sheep {
-  transform-box: fill-box;
-  transform-origin: 30% 100%;
-  animation: scenery-graze 4s ease-in-out infinite alternate;
+/* Totoro is about a third of a phone's screen height (about 310px on an iPhone), capped at 416px on tablets and
+   laptops; he drifts over the upper part of the screen. */
+.scenery-flyer {
+  --flyer: min(max(33.3vw, 33.3vh), 416px);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--flyer);
+  animation: scenery-fly 150s ease-in-out infinite;
+}
+
+.scenery-flyer img {
+  display: block;
+  width: 100%;
+  height: auto;
+  /* Soften the picture's crisp cel colours towards the painted background and float him on a sky-tinted shadow. */
+  filter: saturate(0.85) contrast(0.92) brightness(1.04) blur(0.4px) drop-shadow(0 10px 14px rgba(40, 80, 130, 0.25));
+  animation: scenery-bob 6s ease-in-out infinite alternate;
+}
+
+.scenery-grass {
+  height: var(--grass);
 }
 
 .scenery-tuft {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: scenery-breeze 6s ease-in-out infinite alternate;
+}
+
+/* Tall pampas reeds bend from the base in the wind; the plume flutters on its own. */
+.scenery-reed {
+  position: absolute;
+  bottom: calc(var(--grass) * 0.04);
+  aspect-ratio: 60 / 300;
+  transform-origin: 50% 100%;
+  animation: scenery-bend 7s ease-in-out infinite alternate;
+}
+
+.scenery-plume {
+  transform-box: fill-box;
+  transform-origin: 30% 100%;
+  animation: scenery-plume 2.6s ease-in-out infinite alternate;
+}
+
+/* The elf walks inside the grass: the back grass is behind it, the front grass hides its feet. */
+.scenery-elf {
   position: absolute;
   left: 0;
-  bottom: 0;
-  width: clamp(130px, 24vw, 320px);
+  bottom: calc(var(--grass) * 0.1);
+  width: clamp(56px, 13vw, 110px);
+  animation: scenery-wander 90s ease-in-out infinite;
+}
+
+.scenery-elf img {
+  display: block;
+  width: 100%;
   height: auto;
-}
-
-.scenery-blades {
-  transform-box: fill-box;
-  transform-origin: 50% 100%;
-  animation: scenery-sway 5s ease-in-out infinite alternate;
-}
-
-.scenery-totoro {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  width: clamp(148px, 38vw, 320px);
-  height: auto;
-}
-
-.scenery-totoro-lids {
-  transform-box: fill-box;
-  transform-origin: 50% 0%;
-  transform: scaleY(0);
-  animation: scenery-blink 6s ease-in-out infinite;
-}
-
-.scenery-totoro-ear {
-  transform-box: fill-box;
-  transform-origin: 50% 100%;
-  animation: scenery-twitch 7s ease-in-out infinite;
-}
-
-.scenery-totoro-ear-r {
-  animation-duration: 9s;
-  animation-delay: -3.2s;
-}
-
-.scenery-totoro-whisker {
-  transform-box: fill-box;
-  animation: scenery-whisker 5s ease-in-out infinite alternate;
-}
-
-.scenery-totoro-whisker-l {
-  transform-origin: 100% 50%;
-}
-
-.scenery-totoro-whisker-r {
-  transform-origin: 0% 50%;
-  animation-delay: -2.5s;
-}
-
-.scenery-seed {
-  position: absolute;
-  width: 14px;
-  height: auto;
-  opacity: 0;
-  animation: scenery-float 24s linear infinite;
+  /* The picture's elf is grey-shaded; brighten it and give it a soft warm glow so it reads against the grass. */
+  filter: brightness(1.25) drop-shadow(0 0 4px rgba(255, 252, 235, 0.6));
+  animation:
+    scenery-face 90s linear infinite,
+    scenery-hop 1.4s ease-in-out infinite alternate;
 }
 
 /* ---------- dark ---------- */
@@ -244,132 +247,119 @@
 
 /* ---------- motion ---------- */
 
+@keyframes scenery-mist {
+  from {
+    transform: translateX(-20%) scale(1);
+    opacity: 0.4;
+  }
+  to {
+    transform: translateX(20%) scale(1.25);
+    opacity: 0.9;
+  }
+}
+
 @keyframes scenery-drift {
   from {
-    transform: translateX(-3vw);
+    transform: translateX(-100%);
   }
   to {
-    transform: translateX(3vw);
+    transform: translateX(100vw);
   }
 }
 
-@keyframes scenery-cross {
-  from {
-    transform: translate(0, 0);
-  }
-  50% {
-    transform: translate(60vw, -3vh);
-  }
-  to {
-    transform: translate(125vw, 1vh);
-  }
-}
-
-@keyframes scenery-wingbeat {
-  from {
-    transform: scaleY(1);
-  }
-  to {
-    transform: scaleY(-0.6);
-  }
-}
-
-@keyframes scenery-walk {
+/* Scale follows height (0.75 at the top of the path, 1.15 at the bottom) so he looks further away up high and
+   nearer low down; translate and scale interpolate together, so purely sideways stretches keep his size. */
+@keyframes scenery-fly {
   0%,
   100% {
-    transform: translateY(0) rotate(-0.8deg);
+    transform: translate(calc((100vw - var(--flyer)) * 0.08), 4vh) scale(0.77);
   }
-  25%,
-  75% {
-    transform: translateY(-3px) rotate(0deg);
+  20% {
+    transform: translate(calc((100vw - var(--flyer)) * 0.62), 2vh) scale(0.75);
   }
-  50% {
-    transform: translateY(0) rotate(0.8deg);
+  40% {
+    transform: translate(calc((100vw - var(--flyer)) * 0.92), calc((60vh - var(--flyer)) * 0.8)) scale(1.07);
   }
-}
-
-@keyframes scenery-smoke {
-  0% {
-    transform: translate(-50%, -40%) scale(0.35);
-    opacity: 0;
+  60% {
+    transform: translate(calc((100vw - var(--flyer)) * 0.45), calc(60vh - var(--flyer))) scale(1.15);
   }
-  12% {
-    opacity: 0.85;
-  }
-  100% {
-    transform: translate(20%, -280%) scale(1.8);
-    opacity: 0;
+  80% {
+    transform: translate(0, calc((60vh - var(--flyer)) * 0.5)) scale(0.95);
   }
 }
 
-@keyframes scenery-graze {
+@keyframes scenery-bob {
   from {
-    transform: translateY(0) rotate(0deg);
+    transform: translateY(0) rotate(-3deg);
   }
   to {
-    transform: translateY(1px) rotate(4deg);
+    transform: translateY(-10px) rotate(3deg);
   }
 }
 
-@keyframes scenery-sway {
+@keyframes scenery-breeze {
+  from {
+    transform: rotate(-2deg);
+  }
+  to {
+    transform: rotate(3deg);
+  }
+}
+
+@keyframes scenery-bend {
   from {
     transform: rotate(-3deg);
   }
   to {
-    transform: rotate(4deg);
+    transform: rotate(10deg);
   }
 }
 
-@keyframes scenery-blink {
-  0%,
-  90%,
-  100% {
-    transform: scaleY(0);
-  }
-  93%,
-  95% {
-    transform: scaleY(1);
-  }
-}
-
-@keyframes scenery-twitch {
-  0%,
-  84%,
-  93%,
-  100% {
-    transform: rotate(0deg);
-  }
-  87% {
-    transform: rotate(-7deg);
-  }
-  90% {
-    transform: rotate(4deg);
-  }
-}
-
-@keyframes scenery-whisker {
+@keyframes scenery-plume {
   from {
-    transform: rotate(-2.5deg);
+    transform: rotate(-4deg);
   }
   to {
-    transform: rotate(2.5deg);
+    transform: rotate(6deg);
   }
 }
 
-@keyframes scenery-float {
-  0% {
-    transform: translate(0, 0) rotate(0deg);
-    opacity: 0;
+/* The elf sits, toddles right, sits, toddles further, sits, then walks home; scenery-face turns it round for the walk back. */
+@keyframes scenery-wander {
+  0%,
+  16% {
+    transform: translateX(6vw);
   }
-  10% {
-    opacity: 0.95;
+  36%,
+  50% {
+    transform: translateX(38vw);
   }
-  85% {
-    opacity: 0.8;
+  68%,
+  80% {
+    transform: translateX(70vw);
   }
   100% {
-    transform: translate(34vw, -30vh) rotate(50deg);
-    opacity: 0;
+    transform: translateX(6vw);
+  }
+}
+
+@keyframes scenery-face {
+  0%,
+  79.9% {
+    transform: scaleX(1);
+  }
+  80%,
+  100% {
+    transform: scaleX(-1);
+  }
+}
+
+@keyframes scenery-hop {
+  from {
+    translate: 0 0;
+  }
+  to {
+    translate: 0 -3px;
   }
 }
 
@@ -437,13 +427,5 @@
 
   .scenery-mote {
     opacity: 0.6;
-  }
-
-  .scenery-smoke {
-    opacity: 0.5;
-  }
-
-  .scenery-seed {
-    opacity: 0.8;
   }
 }
