@@ -7,7 +7,7 @@ import { Gate } from './components/Gate';
 import { Picker } from './components/Picker';
 import { CalendarScreen } from './components/CalendarScreen';
 
-const THEME_COLOR = { light: '#FBD9CC', dark: '#06101F' };
+const THEME_COLOR = { light: '#8CC6EC', dark: '#06101F' };
 
 export function App() {
   const [theme, setTheme] = useTheme();

@@ -20,63 +20,128 @@
 /* ---------- light ---------- */
 
 .scenery-light {
-  background:
-    radial-gradient(ellipse 80% 45% at 50% 0%, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 70%),
-    linear-gradient(to bottom, #fff7f3 0%, #fdebe3 48%, #fbd9cc 100%);
+  --scenery-near: clamp(200px, max(30vh, 24vw), 460px);
+  background: linear-gradient(to bottom, #3e8fd0 0%, #63a9df 28%, #8cc6ec 48%, #d8eef8 72%, #d8eef8 100%);
 }
 
-.scenery-cloud {
+.scenery-cumulus {
   position: absolute;
   height: auto;
-  opacity: 0.92;
-  animation: scenery-drift 50s ease-in-out infinite alternate;
+  animation: scenery-drift 70s ease-in-out infinite alternate;
 }
 
-.scenery-mountains {
-  height: 62vh;
-}
-
-.scenery-heart {
+.scenery-bird {
   position: absolute;
+  left: -8vw;
+  animation: scenery-cross 50s linear infinite;
+}
+
+.scenery-bird-wings {
+  width: 100%;
   height: auto;
-  animation: scenery-bob 9s ease-in-out infinite alternate;
+  transform-origin: 50% 60%;
+  animation: scenery-wingbeat 0.7s ease-in-out infinite alternate;
 }
 
-.scenery-heart-rose {
-  color: #f9c4cf;
-  opacity: 0.7;
+.scenery-far {
+  height: clamp(380px, max(68vh, 46vw), 900px);
 }
 
-.scenery-heart-pale {
-  color: #ffffff;
-  opacity: 0.38;
-}
-
-.scenery-trees {
+/* The castle stands behind the near hill so its feet sink just below the ridge at every size. */
+.scenery-castle {
   position: absolute;
-  bottom: calc(clamp(120px, max(18vh, 16vw), 280px) * 0.42);
-  width: clamp(250px, min(36vw, 52vh), 560px);
+  left: clamp(4px, 7vw, 140px);
+  bottom: calc(var(--scenery-near) * 0.66);
+  width: clamp(120px, 19vw, 290px);
+}
+
+.scenery-castle-body {
+  width: 100%;
+  height: auto;
+  transform-origin: 50% 100%;
+  animation: scenery-walk 2.6s ease-in-out infinite;
+}
+
+.scenery-smoke {
+  position: absolute;
+  width: 17%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 45% 40%, rgba(96, 96, 96, 0.85) 0%, rgba(74, 74, 74, 0.7) 45%, rgba(74, 74, 74, 0) 70%);
+  opacity: 0;
+  animation: scenery-smoke 7s ease-out infinite;
+}
+
+.scenery-near {
+  height: var(--scenery-near);
+}
+
+.scenery-sheep {
+  transform-box: fill-box;
+  transform-origin: 30% 100%;
+  animation: scenery-graze 4s ease-in-out infinite alternate;
+}
+
+.scenery-tuft {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: clamp(130px, 24vw, 320px);
   height: auto;
 }
 
-.scenery-trees-left {
-  left: -5%;
+.scenery-blades {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: scenery-sway 5s ease-in-out infinite alternate;
 }
 
-.scenery-trees-right {
-  right: -5%;
-}
-
-.scenery-branch {
+.scenery-totoro {
   position: absolute;
-  top: 0;
   right: 0;
-  width: clamp(170px, 26vw, 400px);
+  bottom: 0;
+  width: clamp(148px, 38vw, 320px);
   height: auto;
 }
 
-.scenery-hills {
-  height: clamp(120px, max(18vh, 16vw), 280px);
+.scenery-totoro-lids {
+  transform-box: fill-box;
+  transform-origin: 50% 0%;
+  transform: scaleY(0);
+  animation: scenery-blink 6s ease-in-out infinite;
+}
+
+.scenery-totoro-ear {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: scenery-twitch 7s ease-in-out infinite;
+}
+
+.scenery-totoro-ear-r {
+  animation-duration: 9s;
+  animation-delay: -3.2s;
+}
+
+.scenery-totoro-whisker {
+  transform-box: fill-box;
+  animation: scenery-whisker 5s ease-in-out infinite alternate;
+}
+
+.scenery-totoro-whisker-l {
+  transform-origin: 100% 50%;
+}
+
+.scenery-totoro-whisker-r {
+  transform-origin: 0% 50%;
+  animation-delay: -2.5s;
+}
+
+.scenery-seed {
+  position: absolute;
+  width: 14px;
+  height: auto;
+  opacity: 0;
+  animation: scenery-float 24s linear infinite;
 }
 
 /* ---------- dark ---------- */
@@ -188,12 +253,123 @@
   }
 }
 
-@keyframes scenery-bob {
+@keyframes scenery-cross {
   from {
-    transform: translateY(0) rotate(-6deg);
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(60vw, -3vh);
   }
   to {
-    transform: translateY(-10px) rotate(6deg);
+    transform: translate(125vw, 1vh);
+  }
+}
+
+@keyframes scenery-wingbeat {
+  from {
+    transform: scaleY(1);
+  }
+  to {
+    transform: scaleY(-0.6);
+  }
+}
+
+@keyframes scenery-walk {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-0.8deg);
+  }
+  25%,
+  75% {
+    transform: translateY(-3px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(0) rotate(0.8deg);
+  }
+}
+
+@keyframes scenery-smoke {
+  0% {
+    transform: translate(-50%, -40%) scale(0.35);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.85;
+  }
+  100% {
+    transform: translate(20%, -280%) scale(1.8);
+    opacity: 0;
+  }
+}
+
+@keyframes scenery-graze {
+  from {
+    transform: translateY(0) rotate(0deg);
+  }
+  to {
+    transform: translateY(1px) rotate(4deg);
+  }
+}
+
+@keyframes scenery-sway {
+  from {
+    transform: rotate(-3deg);
+  }
+  to {
+    transform: rotate(4deg);
+  }
+}
+
+@keyframes scenery-blink {
+  0%,
+  90%,
+  100% {
+    transform: scaleY(0);
+  }
+  93%,
+  95% {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes scenery-twitch {
+  0%,
+  84%,
+  93%,
+  100% {
+    transform: rotate(0deg);
+  }
+  87% {
+    transform: rotate(-7deg);
+  }
+  90% {
+    transform: rotate(4deg);
+  }
+}
+
+@keyframes scenery-whisker {
+  from {
+    transform: rotate(-2.5deg);
+  }
+  to {
+    transform: rotate(2.5deg);
+  }
+}
+
+@keyframes scenery-float {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.95;
+  }
+  85% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(34vw, -30vh) rotate(50deg);
+    opacity: 0;
   }
 }
 
@@ -261,5 +437,13 @@
 
   .scenery-mote {
     opacity: 0.6;
+  }
+
+  .scenery-smoke {
+    opacity: 0.5;
+  }
+
+  .scenery-seed {
+    opacity: 0.8;
   }
 }

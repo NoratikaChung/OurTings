@@ -7,13 +7,13 @@ interface AvatarProps {
   size?: number;
 }
 
-/** Round character portrait: kawaii calico cat / bunny in light, little bug knights in dark. */
+/** Round character portrait: Totoro and Chibi Totoro in light, little bug knights in dark. */
 export function Avatar({ user, theme, size = 96 }: AvatarProps) {
   // useId output may contain characters that are awkward inside url(#…) references.
   const uid = `av${useId().replace(/[^a-zA-Z0-9_-]/g, '')}`;
   const art: ReactNode =
     theme === 'light' ? (
-      user === 'nora' ? <Cat uid={uid} /> : <Bunny />
+      user === 'nora' ? <Chibi /> : <Totoro uid={uid} />
     ) : (
       <Cavern uid={uid}>{user === 'nora' ? <Hornet /> : <Knight />}</Cavern>
     );
@@ -24,80 +24,85 @@ export function Avatar({ user, theme, size = 96 }: AvatarProps) {
   );
 }
 
-/* ---------- light: calico cat ---------- */
+/* ---------- light: big grey Totoro (Anant) ---------- */
 
-const CAT_INK = '#4A2E2A';
-const CAT_HEAD = 'M50 34C71 34 85 45 85 62C85 78 71 86 50 86C29 86 15 78 15 62C15 45 29 34 50 34Z';
-const CAT_EAR_L = 'M20 56C17 44 16 30 19 21C20.5 16.5 24.5 15 28.5 17.5C35 21.5 41 28 47 37Z';
-const CAT_EAR_R = 'M80 56C83 44 84 30 81 21C79.5 16.5 75.5 15 71.5 17.5C65 21.5 59 28 53 37Z';
+const TOTORO_INK = '#3A3230';
+const TOTORO_FUR = '#8E8F94';
+const CHEVRON = 'M-4.5 2Q0-4 4.5 2Q0-0.5-4.5 2Z';
 
-function Cat({ uid }: { uid: string }) {
-  const clip = `${uid}-head`;
+function Totoro({ uid }: { uid: string }) {
+  const clip = `${uid}-disc`;
   return (
     <>
       <defs>
         <clipPath id={clip}>
-          <path d={CAT_HEAD} />
+          <circle cx="50" cy="50" r="45.5" />
         </clipPath>
       </defs>
-      <circle cx="50" cy="50" r="50" fill="#FBD3DC" />
-      <g stroke={CAT_INK} strokeWidth="3.6" strokeLinejoin="round">
-        <path d={CAT_EAR_L} fill="#F0A35E" />
-        <path d={CAT_EAR_R} fill="#3B2A26" />
+      <circle cx="50" cy="50" r="50" fill="#F2A541" />
+      <g clipPath={`url(#${clip})`} stroke={TOTORO_INK} strokeLinejoin="round" strokeLinecap="round">
+        <g fill={TOTORO_FUR} strokeWidth="2.6">
+          <path d="M30 44C26 34 26 22 30 12C35 20 39 31 40 41Z" />
+          <path d="M70 44C74 34 74 22 70 12C65 20 61 31 60 41Z" />
+          <path d="M50 34C66 34 76 42 79 56C82 70 86 86 88 104H12C14 86 18 70 21 56C24 42 34 34 50 34Z" />
+        </g>
+        <ellipse cx="50" cy="98" rx="27" ry="24" fill="#F3ECD9" stroke="none" />
+        <g fill="#77787D" stroke="none">
+          <path d={CHEVRON} transform="translate(40 84)" />
+          <path d={CHEVRON} transform="translate(50 81)" />
+          <path d={CHEVRON} transform="translate(60 84)" />
+        </g>
+        <g fill="none" strokeWidth="1.8">
+          <path d="M24 55L9 51M24 60L8 60M25 65L10 69M76 55L91 51M76 60L92 60M75 65L90 69" />
+        </g>
+        <g fill="#FFFDF5" strokeWidth="2">
+          <circle cx="36" cy="52" r="6" />
+          <circle cx="64" cy="52" r="6" />
+        </g>
+        <circle cx="37" cy="52" r="2.4" fill={TOTORO_INK} stroke="none" />
+        <circle cx="63" cy="52" r="2.4" fill={TOTORO_INK} stroke="none" />
+        <path d="M46.5 47.5Q50 46 53.5 47.5Q50 51 46.5 47.5Z" fill={TOTORO_INK} strokeWidth="1" />
+        <path d="M29 59C38 66 62 66 71 59C68 71 32 71 29 59Z" fill="#FFFDF5" strokeWidth="2.2" />
+        <path d="M40 63.4V67.2M50 64.3V68M60 63.4V67.2" fill="none" strokeWidth="1.5" />
       </g>
-      <path d="M23.5 39C22.5 32.5 23 27 25 23.5C29.5 25 34 29 37.5 34Z" fill="#F7B6C8" />
-      <path d="M76.5 39C77.5 32.5 77 27 75 23.5C70.5 25 66 29 62.5 34Z" fill="#F7B6C8" />
-      <path d={CAT_HEAD} fill="#FFFFFF" />
-      <g clipPath={`url(#${clip})`}>
-        <path
-          d="M8 28H47C48.5 37 44.5 42 46.5 48C48.5 55 43 63.5 34 63.5C27.5 63.5 23 59.5 18 62.5L8 63Z"
-          fill="#F0A35E"
-        />
-        <path d="M62 28H92V47C86 50 81 45.5 75.5 46.5C69 47.5 63 44 63 39C63 34.5 65 31.5 62 28Z" fill="#3B2A26" />
-      </g>
-      <path d={CAT_HEAD} fill="none" stroke={CAT_INK} strokeWidth="3.6" />
-      <g stroke={CAT_INK} strokeWidth="2.4" strokeLinecap="round" fill="none">
-        <path d="M14 61.5L5 59.5M14.5 67.5L6 69.5M86 61.5L95 59.5M85.5 67.5L94 69.5" />
-        <path d="M50 64.5V67.5M44.5 67C46 71.5 49 71.5 50 67.5C51 71.5 54 71.5 55.5 67" strokeWidth="2.6" />
-      </g>
-      <ellipse cx="29.5" cy="70" rx="5.5" ry="3" fill="#F6A3BA" />
-      <ellipse cx="70.5" cy="70" rx="5.5" ry="3" fill="#F6A3BA" />
-      <circle cx="36.5" cy="61" r="4.3" fill={CAT_INK} />
-      <circle cx="63.5" cy="61" r="4.3" fill={CAT_INK} />
-      <circle cx="37.9" cy="59.5" r="1.3" fill="#FFFFFF" />
-      <circle cx="64.9" cy="59.5" r="1.3" fill="#FFFFFF" />
+      <circle cx="50" cy="50" r="46.5" fill="none" stroke="#6B4A2E" strokeWidth="3.2" />
     </>
   );
 }
 
-/* ---------- light: bunny ---------- */
+/* ---------- light: little white Chibi Totoro with a sprout (Nora) ---------- */
 
-const BUNNY_INK = '#2A2321';
-const BUNNY_FACE = 'M50 40C72 40 87 55 87 70C87 82 72 88 50 88C28 88 13 82 13 70C13 55 28 40 50 40Z';
+const CHIBI_INK = '#4A3F38';
 
-function Bunny() {
+function Chibi() {
   return (
     <>
-      <circle cx="50" cy="50" r="50" fill="#AEEBD9" />
-      <g stroke={BUNNY_INK} strokeWidth="3.6" fill="#FFF8EE">
-        <ellipse cx="36" cy="31" rx="9.5" ry="22" transform="rotate(-9 36 31)" />
-        <ellipse cx="64" cy="31" rx="9.5" ry="22" transform="rotate(9 64 31)" />
-      </g>
-      <ellipse cx="36.5" cy="31" rx="5" ry="15" transform="rotate(-9 36 31)" fill="#FBE3D2" />
-      <ellipse cx="63.5" cy="31" rx="5" ry="15" transform="rotate(9 64 31)" fill="#FBE3D2" />
-      <path d={BUNNY_FACE} fill="#FFF8EE" stroke={BUNNY_INK} strokeWidth="3.6" />
-      <circle cx="27.5" cy="71.5" r="5.8" fill="#F9B7B3" />
-      <circle cx="72.5" cy="71.5" r="5.8" fill="#F9B7B3" />
-      <circle cx="37.5" cy="65" r="3.8" fill={BUNNY_INK} />
-      <circle cx="62.5" cy="65" r="3.8" fill={BUNNY_INK} />
+      <circle cx="50" cy="50" r="50" fill="#B9CDA4" />
+      <path d="M18 92C30 86 70 86 82 92C70 97 30 97 18 92Z" fill="#A6BE8F" />
       <path
-        d="M44 68C45 72.5 49 73 50 68.5C51 73 55 72.5 56 68"
-        fill="none"
-        stroke={BUNNY_INK}
-        strokeWidth="2.6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
+        fill="#9AB585"
+        d="M14 84L16.5 75L19 84L21.5 77.5L24 85ZM77 85L79.5 76L82 84.5L84.5 78L86.5 86ZM60 90L62 83L64 90L66 85L68 91Z"
       />
+      <g transform="translate(3 0)" stroke={CHIBI_INK} strokeLinejoin="round" strokeLinecap="round">
+        <ellipse cx="40" cy="84" rx="7" ry="3.6" fill="#FFFFFF" strokeWidth="2.2" />
+        <path
+          d="M55 84C69 84 76 75 75 63C74.5 55 72 48 69.5 43L71 29L62.5 36.5C59 35.5 54 35.5 49.5 36.5L41 29L41.5 43C37 49 35 56 35 64C35 76 43 84 55 84Z"
+          fill="#FFFFFF"
+          strokeWidth="2.8"
+        />
+        <ellipse cx="56" cy="78.5" rx="12.5" ry="4" fill="#F4E4DF" stroke="none" />
+        <path d="M37 66C33 56 31 40 33.5 22" fill="none" strokeWidth="2.2" />
+        <g fill="#7CC242" strokeWidth="2">
+          <path d="M33.5 22C30 16 23 15 20 18C23 22 29 23 33.5 22Z" />
+          <path d="M33.5 22C36 15 43 13 47 15.5C44 20 38 22 33.5 22Z" />
+        </g>
+        <ellipse cx="38" cy="63" rx="3.6" ry="4.6" fill="#FFFFFF" strokeWidth="2.2" />
+        <circle cx="49" cy="55" r="2.7" fill={CHIBI_INK} stroke="none" />
+        <circle cx="63" cy="55" r="2.7" fill={CHIBI_INK} stroke="none" />
+        <circle cx="49.9" cy="54.1" r="0.8" fill="#FFFFFF" stroke="none" />
+        <circle cx="63.9" cy="54.1" r="0.8" fill="#FFFFFF" stroke="none" />
+        <path d="M53.5 61Q56 63.2 58.5 61" fill="none" strokeWidth="1.8" />
+      </g>
     </>
   );
 }

@@ -2,22 +2,22 @@
 :root,
 [data-theme='light'] {
   color-scheme: light;
-  --ink: #5b3e8c;
-  --ink-soft: #9a7cbf;
-  --paper: rgba(255, 250, 247, 0.84);
-  --paper-solid: #fff9f6;
-  --line: rgba(122, 90, 160, 0.16);
-  --accent: #e83e8c;
+  --ink: #3b4a3a;
+  --ink-soft: #6e8366;
+  --paper: rgba(255, 252, 243, 0.86);
+  --paper-solid: #fffcf3;
+  --line: rgba(59, 74, 58, 0.16);
+  --accent: #3d8bc9;
   --accent-ink: #fff;
-  --accent-shadow: 0 8px 20px rgba(232, 62, 140, 0.35);
-  --today: #e83e8c;
-  --selected: #fbd3dc;
-  --nora: #f07c9c;
-  --nora-note: #ffe3ea;
-  --anant: #4fc7a6;
-  --anant-note: #dcf7ee;
-  --shadow: 0 6px 22px rgba(122, 90, 160, 0.16);
-  --backdrop: rgba(91, 62, 140, 0.28);
+  --accent-shadow: 0 8px 20px rgba(61, 139, 201, 0.35);
+  --today: #3d8bc9;
+  --selected: #dcebf6;
+  --nora: #7fa66a;
+  --nora-note: #e6f0dc;
+  --anant: #e8962e;
+  --anant-note: #fce8c8;
+  --shadow: 0 6px 22px rgba(59, 74, 58, 0.16);
+  --backdrop: rgba(40, 60, 40, 0.28);
   --title-font: 'Nunito', system-ui, sans-serif;
 }
 

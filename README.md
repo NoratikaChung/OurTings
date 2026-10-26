@@ -2,10 +2,10 @@
 
 Private shared calendar for Nora and Anant. Installable web app (PWA) for iPhone, iPad, Android tablet and laptop.
 
-- Unlock each device once with a shared secret code, then tap your icon (cat/Hornet = Nora, bunny/Knight = Anant). You stay that user until **Log out**.
+- Unlock each device once with a shared secret code, then tap your icon (little white Totoro/Hornet = Nora, big Totoro/Knight = Anant). You stay that user until **Log out**.
 - Day / week / month / year views. Show or hide each person's calendar; the toggles and last view are remembered per user on each device.
 - Events (name, notes, place, date & time, all-day) and yearly birthdays, shown as sticky notes in the owner's colour. Anyone can comment.
-- Light (pink trees) and dark (Hollow Knight–style) themes, toggled with the sun/moon button and remembered per device.
+- Light (Studio Ghibli–style: Howl's-like landscape with Totoro) and dark (Hollow Knight–style) themes, toggled with the sun/moon button and remembered per device.
 - Changes sync live between devices and work offline (they upload when back online).
 
 ## Stack (all free tiers)
@@ -66,4 +66,4 @@ Node 24. `npm ci`, then:
 - **Push notifications** when the other person adds an event: web-push with VAPID keys from a Vercel function. On iPhone/iPad this needs the Home Screen app (iOS 16.4+).
 
 ## Artwork
-All illustrations (cat, bunny, Knight- and Hornet-style avatars, both landscapes, app icon) are original SVGs in `src/art/` and `public/icon.svg`, made for this app. Hollow Knight characters belong to Team Cherry; the dark theme is private, non-commercial fan art.
+All illustrations (Totoro-style and Knight/Hornet-style avatars, both animated landscapes, app icon) are original SVGs in `src/art/` and `public/icon.svg`, made for this app. Totoro and Howl's Moving Castle belong to Studio Ghibli and Hollow Knight characters to Team Cherry; both themes are private, non-commercial fan art.
