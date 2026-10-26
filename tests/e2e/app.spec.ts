@@ -46,6 +46,11 @@ test('wrong code stays locked', async ({ page }) => {
 });
 
 test('two devices share events and comments; prefs and login persist', async ({ page, browser }) => {
+  test.slow(); // ~40 steps across two browsers; WebKit on Windows takes ~60 s
+  // 3 PM, so the 10:00 picnic has already ended today: it must still be listed for the day.
+  const afternoon = new Date();
+  afternoon.setHours(15, 0, 0, 0);
+  await page.clock.setFixedTime(afternoon);
   await unlockAs(page, 'Nora');
 
   // Nora adds an event.
@@ -59,6 +64,7 @@ test('two devices share events and comments; prefs and login persist', async ({ 
 
   // Anant, on another device, sees it live and comments.
   const other = await newDevice(browser, page);
+  await other.clock.setFixedTime(afternoon);
   await unlockAs(other, 'Anant');
   await other.getByRole('button', { name: /Picnic/ }).click();
   await expect(other.getByRole('dialog')).toContainText('Botanic Garden');

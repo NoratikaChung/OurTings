@@ -8,6 +8,7 @@ import {
   isSameDay,
   isSameMonth,
   isToday,
+  startOfDay,
   startOfMonth,
   startOfWeek,
 } from 'date-fns';
@@ -32,7 +33,7 @@ export function MonthView({ events, cursor, onSelect, onOpen, onCreate, onOpenDa
     [events, days],
   );
   const on = (d: Date) => occurrences.filter((o) => o.start < addDays(d, 1) && o.end > d);
-  const selected = on(cursor);
+  const selected = on(startOfDay(cursor));
 
   return (
     <div className="month">

@@ -15,8 +15,9 @@ Read README.md first (features, setup, commands). This file records decisions an
 
 ## Status
 - Phase 1 implemented: device code gate, user picker, logout, day/week/month/year views, per-user filters + saved view, events with place/notes/all-day, birthdays, comments, light/dark theme, offline cache, PWA icons/manifest.
-- Not done (user-controlled): Firebase project creation, Vercel project/env vars, domain DNS, GitHub remote/push. No commits made.
+- GitHub: `main` pushed to https://github.com/NoratikaChung/OurTings (first commit `3a96f8c`). Not done (user-controlled): Firebase project creation, Vercel project/env vars, domain DNS.
 - Phase 2 (planned, not started): Malaysia public holidays + Hindu events feeds; push notifications for new events.
+- Fixed: first GitHub Actions run (40322341706) failed the 4 "two devices" e2e tests. Cause was an app bug, not CI: the month view's selected-day list filtered by the current time of day, so events that had already ended today were hidden (CI ran at 12:29 UTC, after the 10:00 test event; local runs were at ~4 AM). Fix: `startOfDay(cursor)` in `MonthView.tsx`. The e2e test now fixes the browser clock at 15:00 so it always covers that case (verified it fails without the fix).
 
 ## Verification (2026-10-26, local)
 - `npm run lint`, `npm run typecheck`, `npm test` (6 unit tests), `npm run build` (PWA: sw.js + manifest, 35 precached files), `npm audit --omit=dev --audit-level=high` (0, after `@grpc/grpc-js` override for Firestore's Node-only build): all pass.
