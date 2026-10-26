@@ -1,12 +1,11 @@
 import { useCallback, useState } from 'react';
-import type { Theme, UserId, ViewMode } from '../types';
+import type { Theme, UserId } from '../types';
 
 export interface UserPrefs {
   visible: Record<UserId, boolean>;
-  view: ViewMode;
 }
 
-export const DEFAULT_PREFS: UserPrefs = { visible: { nora: true, anant: true }, view: 'month' };
+export const DEFAULT_PREFS: UserPrefs = { visible: { nora: true, anant: true } };
 
 const KEY = {
   user: 'ourtings:user',
@@ -41,7 +40,7 @@ export const useCurrentUser = () => useStored<UserId | null>(KEY.user, () => nul
 /** Hollow Knight (dark) is the first-open default; a choice made on the device is remembered. */
 export const useTheme = () => useStored<Theme>(KEY.theme, () => 'dark');
 
-/** Calendar toggles and last view, remembered per user on this device. */
+/** Calendar toggles, remembered per user on this device. (The view is not: the app always opens on the month.) */
 export function useUserPrefs(user: UserId) {
   const [prefs, setPrefs] = useStored<UserPrefs>(KEY.prefs(user), () => DEFAULT_PREFS);
   return [{ ...DEFAULT_PREFS, ...prefs }, setPrefs] as const;

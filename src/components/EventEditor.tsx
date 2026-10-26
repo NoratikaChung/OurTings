@@ -1,18 +1,28 @@
 import { useState, type FormEvent } from 'react';
 import { addHours, format, isToday, startOfHour } from 'date-fns';
-import { AlignLeft, ArrowRight, Cake, CalendarDays, Check, Clock, MapPin, Sun, Trash2 } from 'lucide-react';
+import { AlignLeft, ArrowRight, Cake, CalendarDays, CalendarRange, Check, Clock, MapPin, Repeat as RepeatIcon, Sun, Trash2, X } from 'lucide-react';
 import { createEvent, deleteEvent, updateEvent } from '../data/events';
 import { parseLocal, toLocal } from '../lib/occurrences';
-import type { CalendarEvent, EventInput, UserId } from '../types';
+import { REPEAT_NAMES, type CalendarEvent, type EventInput, type Repeat, type UserId } from '../types';
 import { Sheet } from './ui';
 
 /** New event at a moment (`timed` = an exact hour was picked), or an existing event. */
 export type EditorTarget = { start: Date; timed: boolean } | { event: CalendarEvent };
 
+const REPEAT_CHOICES: { value: Repeat; label: string }[] = [
+  { value: 'none', label: 'Once' },
+  { value: 'daily', label: 'Daily' },
+  { value: 'weekly', label: 'Weekly' },
+  { value: 'monthly', label: 'Monthly' },
+  { value: 'yearly', label: 'Yearly' },
+];
+
 function initial(target: EditorTarget, user: UserId): EventInput {
   if ('event' in target) {
     const { id: _id, ...input } = target.event;
-    return input;
+    if (input.allDay || input.kind === 'birthday') return input;
+    // Timed events are edited in this device's own time (saving then records this device's zone).
+    return { ...input, start: toLocal(parseLocal(input.start, input.timeZone)), end: toLocal(parseLocal(input.end, input.timeZone)) };
   }
   let start = new Date(target.start);
   if (!target.timed) {
@@ -25,8 +35,11 @@ function initial(target: EditorTarget, user: UserId): EventInput {
     place: '',
     start: toLocal(start),
     end: toLocal(addHours(start, 1)),
+    timeZone: '',
     allDay: false,
     kind: 'event',
+    repeat: 'none',
+    repeatUntil: '',
     owner: user,
   };
 }
@@ -61,7 +74,9 @@ export function EventEditor({
     set({ start: next, end: toLocal(new Date(parseLocal(draft.end).getTime() + delta)) });
   };
 
-  const invalid = !draft.title.trim() || (!birthday && draft.end < draft.start);
+  const repeat = birthday ? 'none' : draft.repeat;
+  const endsBeforeStart = repeat !== 'none' && draft.repeatUntil !== '' && draft.repeatUntil < startDate;
+  const invalid = !draft.title.trim() || (!birthday && draft.end < draft.start) || endsBeforeStart;
 
   const save = (e: FormEvent) => {
     e.preventDefault();
@@ -73,10 +88,14 @@ export function EventEditor({
       place: draft.place.trim(),
       allDay,
       end: birthday ? draft.start : draft.end,
+      // Dates are the same everywhere; clock times belong to the zone they were entered in.
+      timeZone: allDay ? '' : Intl.DateTimeFormat().resolvedOptions().timeZone,
+      repeat,
+      repeatUntil: repeat === 'none' ? '' : draft.repeatUntil,
     };
     // Don't await: offline writes resolve only after syncing, and the local cache updates instantly.
     (existing ? updateEvent(existing.id, input) : createEvent(input)).catch((err: Error) => onError(err.message));
-    onSaved(parseLocal(input.start));
+    onSaved(parseLocal(input.start, input.timeZone));
     onClose();
   };
 
@@ -129,6 +148,44 @@ export function EventEditor({
             <input type="date" value={endDate} min={startDate} onChange={(e) => e.target.value && set({ end: `${e.target.value}T${endTime}` })} aria-label="End date" required />
             {!allDay && <input type="time" value={endTime} onChange={(e) => e.target.value && set({ end: `${endDate}T${e.target.value}` })} aria-label="End time" required />}
           </div>
+        )}
+
+        {!birthday && (
+          <div className="row">
+            <RepeatIcon size={18} aria-hidden="true" />
+            <div className="seg repeat-seg" role="radiogroup" aria-label="Repeat">
+              {REPEAT_CHOICES.map(({ value, label }) => (
+                <button key={value} type="button" role="radio" aria-checked={draft.repeat === value} onClick={() => set({ repeat: value })}>
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {repeat !== 'none' && (
+          <>
+            <div className="row repeat-range" data-invalid={endsBeforeStart || undefined}>
+              <CalendarRange size={18} aria-hidden="true" />
+              <label>
+                Starts
+                <input type="date" value={startDate} onChange={(e) => moveStart(`${e.target.value}T${startTime}`)} required />
+              </label>
+              <label>
+                Ends
+                <input type="date" value={draft.repeatUntil} min={startDate} onChange={(e) => set({ repeatUntil: e.target.value })} />
+              </label>
+              {draft.repeatUntil && (
+                <button type="button" className="icon-btn" onClick={() => set({ repeatUntil: '' })} aria-label="No end date">
+                  <X size={18} />
+                </button>
+              )}
+            </div>
+            <p className="repeat-summary">
+              {REPEAT_NAMES[repeat]} from {format(parseLocal(startDate), 'd MMM yyyy')}
+              {draft.repeatUntil ? ` until ${format(parseLocal(draft.repeatUntil), 'd MMM yyyy')}` : ', with no end'}
+            </p>
+          </>
         )}
 
         <div className="row">

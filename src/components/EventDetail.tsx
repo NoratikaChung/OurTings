@@ -1,20 +1,23 @@
 import { useEffect, useState, type FormEvent } from 'react';
-import { format, isSameDay } from 'date-fns';
-import { Cake, Clock, MapPin, Pencil, SendHorizontal } from 'lucide-react';
+import { addDays, format, isSameDay } from 'date-fns';
+import { Cake, Clock, Globe, MapPin, Pencil, Repeat, SendHorizontal } from 'lucide-react';
 import { Avatar } from '../art/Avatar';
 import { addComment, subscribeComments } from '../data/events';
-import { parseLocal } from '../lib/occurrences';
-import { USER_NAMES, type EventComment, type Occurrence, type Theme, type UserId } from '../types';
+import { formatTime } from '../lib/format';
+import { isAllDay, parseLocal } from '../lib/occurrences';
+import { REPEAT_NAMES, USER_NAMES, type EventComment, type Occurrence, type Theme, type UserId } from '../types';
 import { Sheet } from './ui';
 
-function when({ event, start }: Occurrence) {
+/** This occurrence's dates and times, in this device's zone. */
+function when({ event, start, end }: Occurrence) {
   if (event.kind === 'birthday') return format(start, 'EEE d MMM yyyy');
-  const s = parseLocal(event.start);
-  const e = parseLocal(event.end);
-  if (event.allDay) return isSameDay(s, e) ? format(s, 'EEE d MMM yyyy') : `${format(s, 'EEE d MMM')} – ${format(e, 'EEE d MMM yyyy')}`;
-  return isSameDay(s, e)
-    ? `${format(s, 'EEE d MMM')} · ${format(s, 'h:mm a')} – ${format(e, 'h:mm a')}`
-    : `${format(s, 'EEE d MMM, h:mm a')} – ${format(e, 'EEE d MMM, h:mm a')}`;
+  if (event.allDay) {
+    const last = addDays(end, -1); // the span ends at the start of the day after
+    return isSameDay(start, last) ? format(start, 'EEE d MMM yyyy') : `${format(start, 'EEE d MMM')} – ${format(last, 'EEE d MMM yyyy')}`;
+  }
+  return isSameDay(start, end)
+    ? `${format(start, 'EEE d MMM')} · ${formatTime(start)} – ${formatTime(end)}`
+    : `${format(start, 'EEE d MMM')}, ${formatTime(start)} – ${format(end, 'EEE d MMM')}, ${formatTime(end)}`;
 }
 
 export function EventDetail({
@@ -31,6 +34,11 @@ export function EventDetail({
   onEdit: () => void;
 }) {
   const { event } = occurrence;
+  // Shown when the event was entered somewhere else, e.g. "6:00 PM in Kuala Lumpur".
+  const elsewhere =
+    !isAllDay(occurrence) && event.timeZone && event.timeZone !== Intl.DateTimeFormat().resolvedOptions().timeZone
+      ? `${new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit', timeZone: event.timeZone }).format(occurrence.start)} in ${event.timeZone.split('/').pop()!.replace(/_/g, ' ')}`
+      : null;
   const [comments, setComments] = useState<EventComment[]>([]);
   const [text, setText] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -57,6 +65,17 @@ export function EventDetail({
         <p>
           <Clock size={16} aria-hidden="true" /> {when(occurrence)}
         </p>
+        {elsewhere && (
+          <p>
+            <Globe size={16} aria-hidden="true" /> {elsewhere}
+          </p>
+        )}
+        {event.kind === 'event' && event.repeat !== 'none' && (
+          <p>
+            <Repeat size={16} aria-hidden="true" /> {REPEAT_NAMES[event.repeat]}
+            {event.repeatUntil && ` until ${format(parseLocal(event.repeatUntil), 'd MMM yyyy')}`}
+          </p>
+        )}
         {event.place && (
           <p>
             <MapPin size={16} aria-hidden="true" /> {event.place}
@@ -70,13 +89,13 @@ export function EventDetail({
 
       <section className="comments" aria-label="Comments">
         {comments.map((c) => (
-          <div key={c.id} className={`comment owner-${c.author}`}>
+          <div key={c.id} className={`comment owner-${c.author}`} data-mine={c.author === user || undefined}>
             <Avatar user={c.author} theme={theme} size={30} />
             <p>
               {c.text}
               <time>
                 {USER_NAMES[c.author]}
-                {c.createdAt && ` · ${format(c.createdAt, 'd MMM, h:mm a')}`}
+                {c.createdAt && ` · ${format(c.createdAt, 'd MMM')}, ${formatTime(c.createdAt)}`}
               </time>
             </p>
           </div>

@@ -18,7 +18,7 @@ import { Note, type ViewProps } from './Note';
 
 const MAX_MARKS = 3;
 
-export function MonthView({ events, cursor, onSelect, onOpen, onCreate, onOpenDay }: ViewProps & { onOpenDay: (d: Date) => void }) {
+export function MonthView({ events, comments, theme, cursor, onSelect, onOpen, onCreate, onOpenDay }: ViewProps & { onOpenDay: (d: Date) => void }) {
   const monthStart = startOfMonth(cursor).getTime();
   const days = useMemo(
     () =>
@@ -74,7 +74,9 @@ export function MonthView({ events, cursor, onSelect, onOpen, onCreate, onOpenDa
       <div className="paper agenda" aria-label={format(cursor, 'EEEE d MMMM')}>
         <h2>{format(cursor, 'EEEE d')}</h2>
         {selected.length ? (
-          selected.map((o) => <Note key={o.event.id + o.start.getTime()} o={o} onOpen={onOpen} detail />)
+          selected.map((o) => (
+            <Note key={o.event.id + o.start.getTime()} o={o} comments={comments.get(o.event.id)} theme={theme} onOpen={onOpen} />
+          ))
         ) : (
           <button type="button" className="empty" onClick={() => onCreate(cursor)} aria-label="Add to this day">
             <Plus size={20} />

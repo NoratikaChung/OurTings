@@ -16,6 +16,9 @@
   --nora-note: #e6f0dc;
   --anant: #e8962e;
   --anant-note: #fce8c8;
+  /* Commenter names: Nora red, Anant blue, in both themes. */
+  --nora-name: #d2414f;
+  --anant-name: #2f78c4;
   --shadow: 0 6px 22px rgba(59, 74, 58, 0.16);
   --backdrop: rgba(40, 60, 40, 0.28);
   --title-font: 'Nunito', system-ui, sans-serif;
@@ -37,6 +40,8 @@
   --nora-note: rgba(179, 40, 58, 0.3);
   --anant: #dfe9f3;
   --anant-note: rgba(223, 233, 243, 0.13);
+  --nora-name: #ff6b7d;
+  --anant-name: #7cc4ff;
   --shadow: 0 0 0 1px rgba(191, 230, 255, 0.1), 0 8px 28px rgba(0, 0, 0, 0.45);
   --backdrop: rgba(2, 8, 18, 0.6);
   --title-font: 'Cinzel', 'Nunito', serif;
@@ -45,10 +50,12 @@
 .owner-nora {
   --c: var(--nora);
   --note: var(--nora-note);
+  --name: var(--nora-name);
 }
 .owner-anant {
   --c: var(--anant);
   --note: var(--anant-note);
+  --name: var(--anant-name);
 }
 
 /* ---------- Base ---------- */
@@ -357,13 +364,15 @@ h3 {
   transform: scale(0.92);
 }
 
-/* ---------- Sticky notes ---------- */
+/* ---------- Event cards ---------- */
 .note {
+  position: relative; /* the comment check measures from the card; the badge sits in its corner */
   display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  column-gap: 8px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
   width: 100%;
+  min-width: 0;
   text-align: left;
   padding: 8px 10px;
   border-radius: 4px 14px 14px 14px;
@@ -371,6 +380,12 @@ h3 {
   border-left: 4px solid var(--c);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
   font-size: 14px;
+  line-height: 1.25;
+}
+/* Lines keep their height; a card too short for everything clips at the bottom (fading in the timetable)
+   instead of squeezing lines over each other. */
+.note > * {
+  flex-shrink: 0;
 }
 .note:nth-child(odd) {
   transform: rotate(-0.6deg);
@@ -378,21 +393,153 @@ h3 {
 .note:nth-child(even) {
   transform: rotate(0.5deg);
 }
+.note-time {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 4px;
+  font-size: 11.5px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: color-mix(in srgb, var(--c) 70%, var(--ink));
+}
+.note-time span {
+  white-space: nowrap;
+}
 .note-title {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 4px;
   font-weight: 800;
-  min-width: 0;
   overflow-wrap: anywhere;
 }
-.note-time,
-.note-place {
+.note-title svg {
+  flex: none;
+}
+/* Place: one line, cut with "…". Notes: two lines. The sheet shows everything. */
+.note-place,
+.note-notes {
   font-size: 12px;
   color: var(--ink-soft);
-  display: inline-flex;
+  overflow: hidden;
+}
+.note-place {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.note-place svg {
+  vertical-align: -1px;
+  margin-right: 3px;
+}
+/* Comments: one speech bubble each (squarish, tail pointing back at the card): [icon] Name: comment… */
+.note-comments {
+  display: grid;
+  gap: 4px;
+  margin-top: 4px;
+  padding-left: 6px;
+}
+/* Comments that don't fit stay laid out but hidden (so the card can tell when they fit again): single bubbles
+   that don't fit, or the whole list when not even one does (the commenter badge shows instead). */
+.note[data-cramped] .note-comments,
+.note-comments > [data-off] {
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  visibility: hidden;
+}
+.note-earlier {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+.bubble {
+  position: relative;
+  display: flex;
   align-items: center;
-  gap: 3px;
+  gap: 5px;
+  min-width: 0;
+  padding: 3px 8px 3px 4px;
+  border-radius: 5px;
+  border: 1px solid color-mix(in srgb, var(--name) 45%, transparent);
+  background: var(--paper-solid);
+  font-size: 11.5px;
+  color: var(--ink);
+}
+.bubble::before {
+  content: '';
+  position: absolute;
+  left: -4px;
+  bottom: 5px;
+  width: 7px;
+  height: 7px;
+  background: inherit;
+  border-left: inherit;
+  border-bottom: inherit;
+  transform: rotate(45deg);
+}
+.bubble svg {
+  flex: none;
+}
+.bubble-text {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.bubble b {
+  color: var(--name);
+}
+/* Latest commenter's icon with a comment-count badge, in the card's top-right corner. */
+.note-badge {
+  position: absolute;
+  top: 4px;
+  right: 8px;
+  display: grid;
+}
+.note-badge-count {
+  position: absolute;
+  top: -4px;
+  right: -7px;
+  min-width: 14px;
+  height: 12px;
+  padding: 0 3px;
+  border-radius: 3px;
+  background: var(--name);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 12px;
+  text-align: center;
+}
+.note-badge-count::before {
+  content: '';
+  position: absolute;
+  left: 1px;
+  bottom: -2px;
+  width: 5px;
+  height: 5px;
+  background: inherit;
+  transform: rotate(45deg);
+}
+.note-notes {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  white-space: pre-line;
+}
+.note[data-compact] {
+  padding: 3px 6px;
+  border-left-width: 3px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  transform: none;
+}
+.note[data-compact] .note-title {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 [data-theme='dark'] .note {
   box-shadow: 0 0 10px color-mix(in srgb, var(--c) 30%, transparent);
@@ -483,98 +630,151 @@ h3 {
   color: var(--ink-soft);
 }
 
-/* ---------- Week ---------- */
-.week {
-  display: grid;
-  gap: 8px;
-}
-.week-day {
-  display: grid;
-  grid-template-columns: 52px 1fr;
-  gap: 8px;
-  padding: 8px;
-  min-height: 60px;
-  border-radius: 18px;
-}
-.week-day[data-selected] {
-  outline: 2px solid var(--accent);
-}
-.week-day-head {
-  display: grid;
-  align-content: start;
-  justify-items: center;
-  font-size: 12px;
-  color: var(--ink-soft);
-  font-weight: 700;
-}
-.week-day-head strong {
-  font-size: 20px;
-  color: var(--ink);
-  width: 36px;
-  height: 36px;
-  display: grid;
-  place-items: center;
-  border-radius: 999px;
-}
-.week-day[data-today] .week-day-head strong {
-  background: var(--today);
-  color: var(--accent-ink);
-}
-.week-day-notes {
-  display: grid;
-  gap: 6px;
-  align-content: start;
-}
-
-/* ---------- Day ---------- */
-.day {
-  display: grid;
-  gap: 10px;
-}
-.all-day {
-  padding: 10px;
-  display: grid;
-  gap: 6px;
-}
-.timeline-scroll {
+/* ---------- Timetable (week and day) ---------- */
+/* One scroller holds the sticky date row and the hours, so every column lines up with its date. */
+.timetable {
+  --gutter: 46px;
   height: calc(100dvh - 230px);
   min-height: 320px;
   overflow-y: auto;
   overscroll-behavior: contain;
 }
-.timeline {
-  --gutter: 58px;
-  position: relative;
-  margin: 0 8px 0 0;
+.tt-row {
+  display: grid;
+  grid-template-columns: var(--gutter) repeat(var(--days), minmax(0, 1fr));
 }
-.hour {
-  position: absolute;
-  left: 0;
-  right: 0;
-  border-top: 1px solid var(--line);
+.tt-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--paper-solid);
+  border-bottom: 1px solid var(--line);
 }
-.hour span {
-  position: absolute;
-  left: 8px;
-  top: 2px;
+.tt-day {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  padding: 8px 0 6px;
   font-size: 11px;
   font-weight: 700;
   color: var(--ink-soft);
 }
-.slot {
-  position: absolute;
-  display: flex;
-  padding: 1px 0;
+/* In the day view the date isn't a link (nowhere to go), but it shouldn't look faded either. */
+.tt-day:disabled {
+  opacity: 1;
 }
-.slot .note {
+.tt-day strong {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  font-size: 16px;
+  color: var(--ink);
+}
+.tt-day[data-today] strong {
+  background: var(--today);
+  color: var(--accent-ink);
+}
+.tt-allday {
+  padding-bottom: 6px;
+}
+.tt-label {
+  align-self: center;
+  padding-right: 6px;
+  text-align: right;
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--ink-soft);
+}
+.tt-allday-cell {
+  display: grid;
+  align-content: start;
+  gap: 2px;
+  min-width: 0;
+  padding: 0 2px;
+}
+.tt-body {
+  position: relative;
+}
+.tt-hours {
+  position: relative;
+}
+.tt-hours span {
+  position: absolute;
+  right: 6px;
+  transform: translateY(-50%);
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+.tt-line {
+  position: absolute;
+  left: var(--gutter);
+  right: 0;
+  height: 1px;
+  background: var(--line);
+  pointer-events: none;
+}
+.tt-col {
+  position: relative;
+  border-left: 1px solid var(--line);
+}
+.tt-col[data-today] {
+  background-color: color-mix(in srgb, var(--today) 7%, transparent);
+}
+/* Cards fill their slot; whatever doesn't fit fades out at the bottom edge. The slot's own size (set from the
+   event's time and lane, never from its content) lets the card adapt to both width and height. */
+.tt-event {
+  position: absolute;
+  padding: 1px 2px;
+  container-type: size;
+}
+.tt-event .note {
   height: 100%;
   overflow: hidden;
-  align-content: flex-start;
+  padding: 4px 6px;
+  border-left-width: 3px;
+  border-radius: 8px;
+  font-size: 12.5px;
   transform: none;
+  -webkit-mask-image: linear-gradient(#000 calc(100% - 8px), transparent);
+  mask-image: linear-gradient(#000 calc(100% - 8px), transparent);
+}
+/* Narrow columns (a phone's week): start time, title and the comment badge; the day view and wider screens show
+   the rest. The badge drops under the title here, as the corner would cover the time. */
+@container (max-width: 90px) {
+  .tt-event .note {
+    padding: 3px 4px;
+    font-size: 11px;
+  }
+  .tt-event .note-time {
+    font-size: 10px;
+  }
+  .note-end,
+  .tt-event .note-time svg,
+  .note-place,
+  .note-notes {
+    display: none;
+  }
+  .tt-event .note-badge {
+    position: relative;
+    top: auto;
+    right: auto;
+    align-self: flex-start;
+    margin-top: 5px;
+  }
+}
+/* Shorter than ~45 minutes there's room for one line: the title (the grid already shows when). */
+@container (max-height: 44px) {
+  .tt-event .note-time {
+    display: none;
+  }
 }
 .now {
   position: absolute;
-  left: calc(var(--gutter) - 6px);
+  left: -1px;
   right: 0;
   height: 2px;
   background: var(--today);
@@ -583,7 +783,7 @@ h3 {
 .now::before {
   content: '';
   position: absolute;
-  left: 0;
+  left: -5px;
   top: -4px;
   width: 10px;
   height: 10px;
@@ -801,6 +1001,34 @@ h3 {
   font-weight: 700;
   color: var(--ink-soft);
 }
+.repeat-seg {
+  flex-wrap: wrap;
+  border-radius: 20px;
+}
+.repeat-seg button {
+  padding: 7px 10px;
+  font-size: 14px;
+}
+.repeat-range label {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.repeat-range input {
+  width: 100%;
+}
+.repeat-range[data-invalid] label:last-of-type input {
+  border-color: var(--accent);
+}
+.repeat-summary {
+  margin: -4px 0 0 28px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
 .danger.armed {
   background: var(--accent);
   color: var(--accent-ink);
@@ -854,23 +1082,46 @@ h3 {
   display: grid;
   gap: 10px;
 }
+/* A chat thread: speech bubbles with a tail pointing at the author; your own on the right. */
 .comment {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   align-items: flex-start;
+  max-width: 88%;
+}
+.comment[data-mine] {
+  flex-direction: row-reverse;
+  justify-self: end;
 }
 .comment > svg {
   flex: none;
 }
 .comment p {
+  position: relative;
   margin: 0;
   padding: 8px 12px;
-  border-radius: 4px 16px 16px 16px;
-  background: var(--note);
+  border-radius: 16px;
+  /* Solid (not the see-through note tint) so the tail doesn't show where it overlaps. */
+  background: color-mix(in srgb, var(--c) 20%, var(--paper-solid));
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   display: grid;
   gap: 2px;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
+}
+.comment p::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  left: -5px;
+  width: 10px;
+  height: 10px;
+  background: inherit;
+  transform: rotate(45deg);
+}
+.comment[data-mine] p::before {
+  left: auto;
+  right: -5px;
 }
 .comment time {
   font-size: 11px;
@@ -940,14 +1191,6 @@ h3 {
   .month {
     grid-template-columns: 1fr 320px;
     align-items: start;
-  }
-  .week {
-    grid-template-columns: repeat(7, 1fr);
-  }
-  .week-day {
-    grid-template-columns: 1fr;
-    min-height: 60dvh;
-    align-content: start;
   }
   .year {
     grid-template-columns: repeat(4, 1fr);

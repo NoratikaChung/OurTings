@@ -4,10 +4,11 @@ Private shared calendar for Nora and Anant. Installable web app (PWA) for iPhone
 
 - Opening the link in a browser shows a Hollow Knight–style welcome: Hornet asks you to touch the glowing butterfly; tapping it opens the install prompt where the browser supports one (Android/desktop Chrome, Edge) and reveals a glowing garden with that device's install steps (Apple doesn't allow a button to install, so iPhone/iPad get the Add to Home Screen steps). A faint × skips to the app. The installed app never shows the welcome.
 - Unlock each device once with a shared secret code, then tap your icon (white elf/Hornet = Nora, Totoro/Knight = Anant). You stay that user until **Log out**.
-- Day / week / month / year views. Show or hide each person's calendar; the toggles and last view are remembered per user on each device.
-- Events (name, notes, place, date & time, all-day) and yearly birthdays, shown as sticky notes in the owner's colour. Anyone can comment.
+- Opens on the month with today selected (by the phone's date), every time. Week and day views are a timetable: hours down the side, days side by side, each event a card as tall as it lasts. Show or hide each person's calendar; the toggles are remembered per user on each device.
+- Events (name, notes, place, date & time, all-day) that can repeat daily, weekly, monthly or yearly from their start date, until an optional end date; plus yearly birthdays. Cards in the owner's colour show the time, name, place, notes and the newest comments as speech bubbles (`[icon] Name: comment…`), cut short with "…"; where a card is too small for a bubble, the latest commenter's icon with a comment-count badge shows instead. Tap for everything; the event's comments read like a chat. Anyone can comment.
+- Times follow each phone's own time zone: an event entered in Kuala Lumpur at 6 PM shows at 11 AM on a phone in London (and the sheet adds "6:00 PM in Kuala Lumpur"). All-day events and birthdays keep their date everywhere. Times use the phone's 12/24-hour style.
 - Dark (Hollow Knight–style) is the default theme; light (Studio Ghibli–style: Howl's castle valley with drifting mist, Totoro flying about and the white elf toddling along the bottom) is the alternative, via the sun/moon button and remembered per device.
-- Changes sync live between devices and work offline (they upload when back online).
+- Changes sync live between devices and work offline (they upload when back online). The installed app checks for a new version each time it comes back to the foreground and reloads into it.
 
 ## Stack (all free tiers)
 

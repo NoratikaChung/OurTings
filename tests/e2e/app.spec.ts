@@ -77,19 +77,20 @@ test('two devices share events and comments; prefs and login persist', async ({ 
   await other.getByRole('textbox', { name: 'Comment' }).fill('Bring the mat!');
   await other.getByRole('button', { name: 'Send' }).click();
 
-  // Nora sees the comment live.
+  // Nora sees the comment live, on the card and in the event.
+  await expect(note).toContainText('Bring the mat!');
   await note.click();
   await expect(page.getByRole('dialog')).toContainText('Bring the mat!');
   await page.getByRole('button', { name: 'Close' }).click();
 
-  // Filter, view and theme survive a reload; so does the chosen user and the unlock.
+  // Filter and theme survive a reload, as do the chosen user and the unlock; the view always reopens on the month.
   await page.getByRole('button', { name: "Nora's calendar" }).click();
   await expect(note).toHaveCount(0);
   await page.getByRole('tab', { name: 'Week' }).click();
   await page.getByRole('button', { name: 'Light mode' }).click();
   await page.reload();
   await page.getByRole('button', { name: 'Close' }).click();
-  await expect(page.getByRole('tab', { name: 'Week' })).toHaveAttribute('aria-selected', 'true');
+  await expect(page.getByRole('tab', { name: 'Month' })).toHaveAttribute('aria-selected', 'true');
   await expect(page.getByRole('button', { name: "Nora's calendar" })).toHaveAttribute('aria-pressed', 'false');
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
   await expect(page.getByRole('button', { name: /Picnic/ })).toHaveCount(0);

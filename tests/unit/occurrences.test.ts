@@ -9,8 +9,11 @@ const ev = (patch: Partial<CalendarEvent>): CalendarEvent => ({
   place: '',
   start: '2026-10-26T09:00',
   end: '2026-10-26T10:00',
+  timeZone: '',
   allDay: false,
   kind: 'event',
+  repeat: 'none',
+  repeatUntil: '',
   owner: 'nora',
   ...patch,
 });
@@ -51,6 +54,42 @@ describe('occurrencesBetween', () => {
     ];
     const titles = occurrencesBetween(items, new Date(2026, 9, 26), new Date(2026, 9, 27)).map((o) => o.event.title);
     expect(titles).toEqual(['holiday', 'early', 'late']);
+  });
+});
+
+describe('repeating events', () => {
+  it('repeats weekly up to and including the end date', () => {
+    const yoga = ev({ start: '2026-11-02T09:00', end: '2026-11-02T10:00', repeat: 'weekly', repeatUntil: '2026-11-16' });
+    const occ = occurrencesBetween([yoga], new Date(2026, 10, 1), new Date(2026, 11, 1));
+    expect(occ.map((o) => o.start.getDate())).toEqual([2, 9, 16]);
+  });
+
+  it('puts a monthly 31st on the last day of shorter months without drifting', () => {
+    const rent = ev({ allDay: true, start: '2026-01-31T00:00', end: '2026-01-31T00:00', repeat: 'monthly' });
+    const occ = occurrencesBetween([rent], new Date(2026, 1, 1), new Date(2026, 3, 1));
+    expect(occ.map((o) => o.start)).toEqual([new Date(2026, 1, 28), new Date(2026, 2, 31)]);
+  });
+
+  it('finds exactly one daily repeat on a day years after it started', () => {
+    const pills = ev({ start: '2020-01-01T09:00', end: '2020-01-01T09:15', repeat: 'daily' });
+    const occ = occurrencesBetween([pills], new Date(2026, 10, 2), new Date(2026, 10, 3));
+    expect(occ.map((o) => o.start)).toEqual([new Date(2026, 10, 2, 9, 0)]);
+  });
+});
+
+describe('time zones', () => {
+  it('places a timed event at the instant it has in the zone it was entered in', () => {
+    const call = ev({ start: '2026-11-02T10:00', end: '2026-11-02T11:00', timeZone: 'Asia/Kuala_Lumpur' });
+    const [o] = occurrencesBetween([call], new Date(Date.UTC(2026, 10, 1)), new Date(Date.UTC(2026, 10, 4)));
+    expect(o.start.getTime()).toBe(Date.UTC(2026, 10, 2, 2, 0)); // Kuala Lumpur is UTC+8
+    expect(o.end.getTime()).toBe(Date.UTC(2026, 10, 2, 3, 0));
+  });
+
+  it("keeps a weekly event's clock time in its own zone across a daylight-saving change", () => {
+    // London leaves summer time (UTC+1) on 25 Oct 2026; 9:00 stays 9:00 there.
+    const standup = ev({ start: '2026-10-19T09:00', end: '2026-10-19T09:30', timeZone: 'Europe/London', repeat: 'weekly' });
+    const occ = occurrencesBetween([standup], new Date(Date.UTC(2026, 9, 18)), new Date(Date.UTC(2026, 9, 28)));
+    expect(occ.map((o) => o.start.getTime())).toEqual([Date.UTC(2026, 9, 19, 8, 0), Date.UTC(2026, 9, 26, 9, 0)]);
   });
 });
 

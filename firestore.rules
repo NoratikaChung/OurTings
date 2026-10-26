@@ -13,15 +13,24 @@ service cloud.firestore {
       return u in ['nora', 'anant'];
     }
 
+    // timeZone/repeat/repeatUntil are optional: events saved before they existed lack them.
     function validEvent(d) {
-      return d.keys().hasOnly(['title', 'description', 'place', 'start', 'end', 'allDay', 'kind', 'owner', 'updatedAt', 'createdAt'])
+      return d.keys().hasOnly(['title', 'description', 'place', 'start', 'end', 'timeZone', 'allDay', 'kind', 'repeat', 'repeatUntil', 'owner', 'updatedAt', 'createdAt'])
         && d.title is string && d.title.size() > 0 && d.title.size() <= 120
         && d.description is string && d.description.size() <= 2000
         && d.place is string && d.place.size() <= 200
         && d.start is string && d.end is string && d.start <= d.end
+        && (!('timeZone' in d) || (d.timeZone is string && d.timeZone.size() <= 64))
         && d.allDay is bool
         && d.kind in ['event', 'birthday']
+        && (!('repeat' in d) || d.repeat in ['none', 'daily', 'weekly', 'monthly', 'yearly'])
+        && (!('repeatUntil' in d) || (d.repeatUntil is string && d.repeatUntil.size() <= 10))
         && validUser(d.owner);
+    }
+
+    // The event cards read every event's comments in one collection-group query.
+    match /{path=**}/comments/{commentId} {
+      allow read: if household();
     }
 
     match /events/{eventId} {

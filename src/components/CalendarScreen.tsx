@@ -4,22 +4,32 @@ import {
   addMonths,
   addWeeks,
   addYears,
+  eachDayOfInterval,
   endOfWeek,
   format,
   isSameMonth,
   isSameYear,
+  startOfDay,
   startOfWeek,
 } from 'date-fns';
 import { ChevronLeft, ChevronRight, CloudOff, LogOut, Plus } from 'lucide-react';
 import { Avatar } from '../art/Avatar';
-import { subscribeEvents } from '../data/events';
+import { subscribeCommentSummaries, subscribeEvents } from '../data/events';
 import { WEEK_STARTS_ON } from '../lib/occurrences';
 import { useUserPrefs } from '../lib/prefs';
-import { USERS, USER_NAMES, type CalendarEvent, type Occurrence, type Theme, type UserId, type ViewMode } from '../types';
+import {
+  USERS,
+  USER_NAMES,
+  type CalendarEvent,
+  type CommentSummary,
+  type Occurrence,
+  type Theme,
+  type UserId,
+  type ViewMode,
+} from '../types';
 import { ThemeToggle } from './ui';
 import { MonthView } from './views/MonthView';
-import { WeekView } from './views/WeekView';
-import { DayView } from './views/DayView';
+import { Timetable } from './views/Timetable';
 import { YearView } from './views/YearView';
 import { EventEditor, type EditorTarget } from './EventEditor';
 import { EventDetail } from './EventDetail';
@@ -61,8 +71,11 @@ export function CalendarScreen({
   onLogout: () => void;
 }) {
   const [prefs, setPrefs] = useUserPrefs(user);
+  // Every open starts on this month with today selected, by the phone's own date.
+  const [view, setView] = useState<ViewMode>('month');
   const [cursor, setCursor] = useState(() => new Date());
   const [events, setEvents] = useState<CalendarEvent[]>([]);
+  const [comments, setComments] = useState<Map<string, CommentSummary>>(() => new Map());
   const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState<EditorTarget | null>(null);
   const [viewing, setViewing] = useState<Occurrence | null>(null);
@@ -70,18 +83,33 @@ export function CalendarScreen({
   const swipe = useRef<{ x: number; y: number } | null>(null);
 
   useEffect(() => subscribeEvents((e) => (setEvents(e), setError(null)), (e) => setError(e.message)), []);
+  useEffect(() => subscribeCommentSummaries(setComments, (e) => setError(e.message)), []);
+
+  // An installed app is resumed rather than reopened; if it was left open overnight, come back to today's month.
+  useEffect(() => {
+    let openedOn = startOfDay(new Date()).getTime();
+    const onVisible = () => {
+      const today = startOfDay(new Date()).getTime();
+      if (document.visibilityState !== 'visible' || today === openedOn) return;
+      openedOn = today;
+      setCursor(new Date());
+      setView('month');
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => document.removeEventListener('visibilitychange', onVisible);
+  }, []);
 
   const visible = useMemo(() => events.filter((e) => prefs.visible[e.owner]), [events, prefs.visible]);
   // Keep the open detail in sync with live edits/deletes from the other device.
   const liveViewing = viewing && events.find((e) => e.id === viewing.event.id);
 
-  const view = prefs.view;
-  const setView = (v: ViewMode) => setPrefs({ ...prefs, view: v });
   const go = (n: number) => setCursor(STEP[view](cursor, n));
   const openDay = (d: Date) => (setCursor(d), setView('day'));
 
   const viewProps = {
     events: visible,
+    comments,
+    theme,
     cursor,
     onSelect: setCursor,
     onOpen: setViewing,
@@ -168,8 +196,20 @@ export function CalendarScreen({
         }}
       >
         {view === 'month' && <MonthView {...viewProps} onOpenDay={openDay} />}
-        {view === 'week' && <WeekView {...viewProps} onOpenDay={openDay} />}
-        {view === 'day' && <DayView {...viewProps} onCreate={(start) => setEditing({ start, timed: true })} />}
+        {view === 'week' && (
+          <Timetable
+            {...viewProps}
+            days={eachDayOfInterval({
+              start: startOfWeek(cursor, { weekStartsOn: WEEK_STARTS_ON }),
+              end: endOfWeek(cursor, { weekStartsOn: WEEK_STARTS_ON }),
+            })}
+            onCreate={(start) => setEditing({ start, timed: true })}
+            onOpenDay={openDay}
+          />
+        )}
+        {view === 'day' && (
+          <Timetable {...viewProps} days={[startOfDay(cursor)]} onCreate={(start) => setEditing({ start, timed: true })} />
+        )}
         {view === 'year' && <YearView {...viewProps} onOpenMonth={(d) => (setCursor(d), setView('month'))} />}
       </section>
 
