@@ -1,0 +1,42 @@
+rules_version = '2';
+
+// Only the single shared "household" account may read or write.
+// Its email must match HOUSEHOLD_EMAIL in src/firebase.ts.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function household() {
+      return request.auth != null
+        && request.auth.token.email == 'ourtings@noratikachung.com';
+    }
+
+    function validUser(u) {
+      return u in ['nora', 'anant'];
+    }
+
+    function validEvent(d) {
+      return d.keys().hasOnly(['title', 'description', 'place', 'start', 'end', 'allDay', 'kind', 'owner', 'updatedAt', 'createdAt'])
+        && d.title is string && d.title.size() > 0 && d.title.size() <= 120
+        && d.description is string && d.description.size() <= 2000
+        && d.place is string && d.place.size() <= 200
+        && d.start is string && d.end is string && d.start <= d.end
+        && d.allDay is bool
+        && d.kind in ['event', 'birthday']
+        && validUser(d.owner);
+    }
+
+    match /events/{eventId} {
+      allow read, delete: if household();
+      allow create, update: if household() && validEvent(request.resource.data);
+
+      match /comments/{commentId} {
+        allow read, delete: if household();
+        allow create: if household()
+          && request.resource.data.keys().hasOnly(['text', 'author', 'createdAt'])
+          && request.resource.data.text is string
+          && request.resource.data.text.size() > 0
+          && request.resource.data.text.size() <= 1000
+          && validUser(request.resource.data.author);
+      }
+    }
+  }
+}
