@@ -954,6 +954,119 @@ h3 {
   }
 }
 
+/* ---------- Welcome (browser only) ---------- */
+.welcome-page {
+  min-height: 100dvh;
+  background: #000;
+  color: #f2f2f2;
+  font-family: 'EB Garamond', Georgia, serif; /* dialog and Hornet's whisper */
+}
+.hk-dialog {
+  position: fixed;
+  z-index: 1;
+  top: max(5vh, calc(env(safe-area-inset-top) + 24px));
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(90vw, 560px);
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 8px;
+  text-align: center;
+  font-size: clamp(18px, 4.6vw, 24px);
+  line-height: 1.3;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9);
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.7) 40%, rgba(0, 0, 0, 0) 75%);
+  cursor: default;
+}
+.hk-dialog > svg:first-of-type {
+  width: 78%;
+}
+.hk-dialog > svg:last-of-type {
+  width: 38%;
+}
+.hk-dialog-text {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  min-height: 3.2em;
+}
+.hk-dialog-text p {
+  margin: 0;
+}
+.hk-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 4px 2px;
+  font-size: 0.78em;
+}
+.hk-steps li {
+  display: flex;
+  align-items: center;
+  animation: fade 0.5s both;
+}
+.hk-steps li + li::before {
+  content: '›';
+  margin: 0 5px;
+  opacity: 0.6;
+}
+.hk-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border: 1px solid rgba(242, 242, 242, 0.45);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.45);
+  white-space: nowrap;
+}
+/* Safari's ··· page-menu button is a circle. */
+.hk-step-round {
+  width: 1.9em;
+  height: 1.9em;
+  padding: 0;
+  justify-content: center;
+  border-radius: 50%;
+  letter-spacing: -1px;
+  font-weight: 700;
+}
+.hk-dialog-icon {
+  width: auto;
+  height: 72px;
+  /* Transparent bunny: glow follows its outline instead of a box. */
+  filter: drop-shadow(0 0 10px rgba(191, 230, 255, 0.45));
+  animation: fade 0.6s;
+}
+/* Deliberately faint: attention belongs on the butterfly. */
+.hk-close {
+  position: fixed;
+  z-index: 2;
+  top: max(6px, env(safe-area-inset-top));
+  right: max(6px, env(safe-area-inset-right));
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  opacity: 0.18;
+}
+.hk-close:focus-visible {
+  opacity: 0.8;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

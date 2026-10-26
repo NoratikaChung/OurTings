@@ -21,8 +21,14 @@ test.beforeEach(async () => {
   await signUp(HOUSEHOLD_EMAIL, CODE);
 });
 
-async function unlockAs(page: Page, name: 'Nora' | 'Anant') {
+/** Browser tabs always open on the welcome; its faint × leads to the app. */
+async function openApp(page: Page) {
   await page.goto('/');
+  await page.getByRole('button', { name: 'Close' }).click();
+}
+
+async function unlockAs(page: Page, name: 'Nora' | 'Anant') {
+  await openApp(page);
   await page.getByLabel('Secret code').fill(CODE);
   await page.getByRole('button', { name: 'Unlock' }).click();
   await page.getByRole('button', { name: new RegExp(name) }).click();
@@ -38,7 +44,7 @@ async function newDevice(browser: Browser, page: Page) {
 }
 
 test('wrong code stays locked', async ({ page }) => {
-  await page.goto('/');
+  await openApp(page);
   await page.getByLabel('Secret code').fill('nope');
   await page.getByRole('button', { name: 'Unlock' }).click();
   await expect(page.getByLabel('Secret code')).toHaveAttribute('aria-invalid', 'true');
@@ -80,11 +86,12 @@ test('two devices share events and comments; prefs and login persist', async ({ 
   await page.getByRole('button', { name: "Nora's calendar" }).click();
   await expect(note).toHaveCount(0);
   await page.getByRole('tab', { name: 'Week' }).click();
-  await page.getByRole('button', { name: 'Dark mode' }).click();
+  await page.getByRole('button', { name: 'Light mode' }).click();
   await page.reload();
+  await page.getByRole('button', { name: 'Close' }).click();
   await expect(page.getByRole('tab', { name: 'Week' })).toHaveAttribute('aria-selected', 'true');
   await expect(page.getByRole('button', { name: "Nora's calendar" })).toHaveAttribute('aria-pressed', 'false');
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
   await expect(page.getByRole('button', { name: /Picnic/ })).toHaveCount(0);
 
   // Anant's own view is independent of Nora's toggles.
@@ -95,6 +102,7 @@ test('two devices share events and comments; prefs and login persist', async ({ 
   await page.getByRole('button', { name: 'Log out' }).click();
   await expect(page.getByRole('button', { name: /Anant/ })).toBeVisible();
   await page.reload();
+  await page.getByRole('button', { name: 'Close' }).click();
   await expect(page.getByRole('button', { name: /Anant/ })).toBeVisible();
   await expect(page.getByLabel('Secret code')).toHaveCount(0);
 });
@@ -113,6 +121,36 @@ test('editing and deleting an event', async ({ page }) => {
   await page.getByRole('button', { name: 'Delete' }).click();
   await page.getByRole('button', { name: 'Tap again to delete' }).click();
   await expect(page.getByRole('button', { name: /Dentist/ })).toHaveCount(0);
+});
+
+test('welcome: butterfly reveals install steps and the whisper; × leads to the code screen', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await page.getByRole('button', { name: 'Install OurTings' }).click();
+  const dialog = page.locator('.hk-dialog');
+  await expect(dialog).toContainText('Seek this bunny');
+  // Each device gets its own browser's install steps.
+  const step: Record<string, string> = {
+    iphone: '···', // Safari's page menu, only on iPhone
+    'ipad-pro-12.9': 'View More',
+    'galaxy-tab': 'Install and create shortcut',
+    laptop: 'Cast, save, and share',
+  };
+  await expect(page.locator('.hk-steps')).toContainText(step[test.info().project.name]);
+  await expect(page.getByText('you know who to ask for the secret code')).toBeVisible();
+  await page.getByRole('button', { name: 'Close' }).click();
+  await expect(page.getByLabel('Secret code')).toBeVisible();
+});
+
+test('installed app skips the welcome', async ({ page }) => {
+  await page.addInitScript(() => {
+    const real = window.matchMedia.bind(window);
+    window.matchMedia = (q: string) =>
+      q === '(display-mode: standalone)' ? ({ ...real(q), matches: true } as MediaQueryList) : real(q);
+  });
+  await page.goto('/');
+  await expect(page.getByLabel('Secret code')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Install OurTings' })).toHaveCount(0);
 });
 
 test('Firestore rules reject strangers and anonymous access', async () => {

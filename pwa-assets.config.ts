@@ -3,8 +3,10 @@ import { defineConfig, minimal2023Preset } from '@vite-pwa/assets-generator/conf
 export default defineConfig({
   preset: {
     ...minimal2023Preset,
-    maskable: { ...minimal2023Preset.maskable, resizeOptions: { background: '#8CC6EC' } },
-    apple: { ...minimal2023Preset.apple, resizeOptions: { background: '#8CC6EC' } },
+    // Source is a transparent bunny: browser/desktop icons stay see-through. iOS shows transparency as black anyway,
+    // and Android shapes maskable icons, so both get an explicit black background.
+    maskable: { ...minimal2023Preset.maskable, resizeOptions: { background: '#000000' } },
+    apple: { ...minimal2023Preset.apple, padding: 0, resizeOptions: { background: '#000000' } },
   },
-  images: ['public/icon.svg'],
+  images: ['public/icon.png'],
 });

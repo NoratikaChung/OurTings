@@ -2,10 +2,11 @@
 
 Private shared calendar for Nora and Anant. Installable web app (PWA) for iPhone, iPad, Android tablet and laptop.
 
+- Opening the link in a browser shows a Hollow Knight–style welcome: Hornet asks you to touch the glowing butterfly; tapping it opens the install prompt where the browser supports one (Android/desktop Chrome, Edge) and reveals a glowing garden with install steps (iPhone/iPad: Share → Add to Home Screen; Apple doesn't allow a button to install). A faint × skips to the app. The installed app never shows the welcome.
 - Unlock each device once with a shared secret code, then tap your icon (little white Totoro/Hornet = Nora, big Totoro/Knight = Anant). You stay that user until **Log out**.
 - Day / week / month / year views. Show or hide each person's calendar; the toggles and last view are remembered per user on each device.
 - Events (name, notes, place, date & time, all-day) and yearly birthdays, shown as sticky notes in the owner's colour. Anyone can comment.
-- Light (Studio Ghibli–style: Howl's-like landscape with Totoro) and dark (Hollow Knight–style) themes, toggled with the sun/moon button and remembered per device.
+- Dark (Hollow Knight–style) is the default theme; light (Studio Ghibli–style: Howl's-like landscape with Totoro) is the alternative, via the sun/moon button and remembered per device.
 - Changes sync live between devices and work offline (they upload when back online).
 
 ## Stack (all free tiers)
@@ -59,11 +60,11 @@ Node 24. `npm ci`, then:
 | `npm test` | Unit tests (date/birthday/overlap logic) |
 | `npm run test:e2e` | Playwright on iPhone 14 Pro Max, iPad Pro 12.9", Galaxy Tab, laptop viewports, against the emulators (needs Java 21+; `npx playwright install chromium webkit` once) |
 | `npm run lint` / `npm run typecheck` / `npm run build` | Checks / production build |
-| `npm run icons` | Regenerate PWA icons from `public/icon.svg` |
+| `npm run icons` | Regenerate PWA icons from `public/icon.png` |
 
 ## Next phase (planned, not built)
 - **Malaysia public holidays & Hindu events**: read public holiday calendar feeds through a small Vercel function (cached), shown as their own toggleable calendars.
 - **Push notifications** when the other person adds an event: web-push with VAPID keys from a Vercel function. On iPhone/iPad this needs the Home Screen app (iOS 16.4+).
 
 ## Artwork
-All illustrations (Totoro-style and Knight/Hornet-style avatars, both animated landscapes, app icon) are original SVGs in `src/art/` and `public/icon.svg`, made for this app. Totoro and Howl's Moving Castle belong to Studio Ghibli and Hollow Knight characters to Team Cherry; both themes are private, non-commercial fan art.
+Illustrations (Totoro-style and Knight/Hornet-style avatars, both animated landscapes, the welcome scenery) are original SVGs in `src/art/`. The welcome page's Hornet and Knight are official Hollow Knight character pictures supplied by the user (`assets/characters/`, trimmed and mirrored copies in `src/art/welcome/`). The app icon is the user's bunny picture (`assets/icons/`): `public/icon.png` is that bunny on a transparent square, rendered on black for iPhone/iPad and Android and kept transparent elsewhere (`npm run icons`). Totoro and Howl's Moving Castle belong to Studio Ghibli and Hollow Knight to Team Cherry; this is a private, non-commercial project, so keep the repository private.

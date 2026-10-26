@@ -4,9 +4,10 @@ import { defineConfig, devices } from '@playwright/test';
 export default defineConfig({
   testDir: 'tests/e2e',
   workers: 1, // tests share one emulator database
-  timeout: 60_000,
+  timeout: 90_000, // WebKit on Windows is slow (~3 s per tap)
   reporter: [['list'], ['html', { open: 'never' }]],
-  use: { baseURL: 'http://127.0.0.1:5174', trace: 'retain-on-failure' },
+  // Reduced motion stops the decorative background animations (and holds the welcome butterfly still).
+  use: { baseURL: 'http://127.0.0.1:5174', trace: 'retain-on-failure', reducedMotion: 'reduce' },
   projects: [
     { name: 'iphone', use: { ...devices['iPhone 14 Pro Max'] } },
     { name: 'ipad-pro-12.9', use: { ...devices['iPad Pro 11'], viewport: { width: 1024, height: 1366 } } },

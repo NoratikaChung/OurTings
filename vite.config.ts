@@ -18,8 +18,8 @@ export default defineConfig({
         orientation: 'any',
         start_url: '/',
         scope: '/',
-        background_color: '#FFFCF3',
-        theme_color: '#8CC6EC',
+        background_color: '#06101F',
+        theme_color: '#06101F',
         icons: [
           { src: 'pwa-64x64.png', sizes: '64x64', type: 'image/png' },
           { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png' },
@@ -27,7 +27,8 @@ export default defineConfig({
           { src: 'maskable-icon-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },
-      workbox: { globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'] },
+      // icon.png is only the source for the generated icons; don't make phones cache it.
+      workbox: { globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'], globIgnores: ['icon.png'] },
     }),
   ],
   server: { port: 5173, strictPort: true },

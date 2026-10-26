@@ -38,8 +38,8 @@ function useStored<T>(key: string, initial: () => T) {
 
 export const useCurrentUser = () => useStored<UserId | null>(KEY.user, () => null);
 
-export const useTheme = () =>
-  useStored<Theme>(KEY.theme, () => (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+/** Hollow Knight (dark) is the first-open default; a choice made on the device is remembered. */
+export const useTheme = () => useStored<Theme>(KEY.theme, () => 'dark');
 
 /** Calendar toggles and last view, remembered per user on this device. */
 export function useUserPrefs(user: UserId) {

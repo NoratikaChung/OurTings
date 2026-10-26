@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth, HOUSEHOLD_EMAIL } from './firebase';
 import { useCurrentUser, useTheme } from './lib/prefs';
+import { isInstalled } from './lib/install';
 import { Scenery } from './art/Scenery';
+import { Welcome } from './components/Welcome';
 import { Gate } from './components/Gate';
 import { Picker } from './components/Picker';
 import { CalendarScreen } from './components/CalendarScreen';
@@ -13,6 +15,8 @@ export function App() {
   const [theme, setTheme] = useTheme();
   const [user, setUser] = useCurrentUser();
   const [unlocked, setUnlocked] = useState<boolean | null>(null);
+  // In a browser tab every visit starts at the welcome; the installed app never shows it.
+  const [welcome, setWelcome] = useState(() => !isInstalled());
 
   useEffect(() => onAuthStateChanged(auth, (u) => setUnlocked(u?.email === HOUSEHOLD_EMAIL)), []);
 
@@ -22,6 +26,8 @@ export function App() {
   }, [theme]);
 
   const toggleTheme = () => setTheme(theme === 'light' ? 'dark' : 'light');
+
+  if (welcome) return <Welcome onClose={() => setWelcome(false)} />;
 
   return (
     <>
