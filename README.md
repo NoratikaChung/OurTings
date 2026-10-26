@@ -1,8 +1,8 @@
 # OurTings
 
-Private shared calendar for Nora and Anant. Installable web app (PWA) for iPhone, iPad, Android tablet and laptop.
+Private shared calendar for Nora and Anant. Installable web app (PWA) for iPhone, iPad, Android tablet and laptop. Live at <https://ourtings.noratikachung.com>.
 
-- Opening the link in a browser shows a Hollow Knight–style welcome: Hornet asks you to touch the glowing butterfly; tapping it opens the install prompt where the browser supports one (Android/desktop Chrome, Edge) and reveals a glowing garden with install steps (iPhone/iPad: Share → Add to Home Screen; Apple doesn't allow a button to install). A faint × skips to the app. The installed app never shows the welcome.
+- Opening the link in a browser shows a Hollow Knight–style welcome: Hornet asks you to touch the glowing butterfly; tapping it opens the install prompt where the browser supports one (Android/desktop Chrome, Edge) and reveals a glowing garden with that device's install steps (Apple doesn't allow a button to install, so iPhone/iPad get the Add to Home Screen steps). A faint × skips to the app. The installed app never shows the welcome.
 - Unlock each device once with a shared secret code, then tap your icon (little white Totoro/Hornet = Nora, big Totoro/Knight = Anant). You stay that user until **Log out**.
 - Day / week / month / year views. Show or hide each person's calendar; the toggles and last view are remembered per user on each device.
 - Events (name, notes, place, date & time, all-day) and yearly birthdays, shown as sticky notes in the owner's colour. Anyone can comment.
@@ -16,7 +16,7 @@ Private shared calendar for Nora and Anant. Installable web app (PWA) for iPhone
 | App | Vite + React + TypeScript, `vite-plugin-pwa` (manifest + service worker) |
 | Data | Firebase Firestore (Spark plan), offline cache enabled |
 | Lock | Firebase Auth, one email/password account; the password is the device code; `firestore.rules` only admits that account |
-| Hosting | Vercel, via its native GitHub integration (auto-deploys `main`) |
+| Hosting | Vercel, via its native GitHub integration: every push to `main` deploys immediately, in parallel with CI (it does not wait for the checks unless Vercel **Deployment Checks** are turned on for the `verify` job) |
 | CI | GitHub Actions: lint, unit tests, build, audit, Playwright against the Firebase emulators |
 
 ## One-time setup
@@ -32,12 +32,12 @@ Private shared calendar for Nora and Anant. Installable web app (PWA) for iPhone
 These web config values are public by design; the rules are what protect the data. Changing the code later: **Authentication → Users** → delete the user, then **Add user** again with the same email and the new code. Every device is signed out and asks for the new code once.
 
 ### 2. GitHub
-Create an empty repo `OurTings` under your account, then from this folder:
+Repo: <https://github.com/NoratikaChung/OurTings> (private). Vercel's free plan only deploys commits on a private repo whose **author** is the Vercel account owner, so this repo authors commits as the NoratikaChung account. On a new machine, set it once inside the repo:
 ```sh
-git add -A && git commit -m "OurTings v0.1"
-git remote add origin https://github.com/NoratikaChung/OurTings.git
-git push -u origin main
+git config user.name "Noratika Chung"
+git config user.email "101931866+NoratikaChung@users.noreply.github.com"
 ```
+Commits authored with the work email are blocked by Vercel ("Deployment was blocked").
 
 ### 3. Vercel
 1. **Add New → Project → Import** the `OurTings` repo. The `vercel.json` already sets Vite, `npm ci`, `npm run build`, output `dist`.
@@ -45,9 +45,11 @@ git push -u origin main
 3. **Settings → Domains** → add `ourtings.noratikachung.com` and create the DNS record Vercel shows at your domain provider.
 
 ### 4. Install on each device
-- **iPhone / iPad** (Safari): open the site → Share → **Add to Home Screen** → open it from the Home Screen → enter the code once. The installed app has its own storage, so unlock it there, not just in Safari.
-- **Galaxy Tab S6 Lite** (Chrome): ⋮ → **Install app**.
-- **Laptop** (Chrome/Edge): install icon in the address bar, or just use the website.
+The welcome page shows these steps too. Install, open the app from its icon, then enter the code once (the installed app has its own storage).
+- **iPhone** (Safari): **···** → **Share** → **View More** → **Add to Home Screen**.
+- **iPad** (Safari): **Share** → **View More** → **Add to Home Screen**.
+- **Galaxy Tab S6 Lite** (Chrome): **⋮** → **Install and create shortcut** → **Install**.
+- **Laptop**: Chrome **⋮** → **Cast, save, and share** → **Install OurTings**; Edge **···** → **Apps** → **Install this site as an app**. Or just use the website.
 
 ## Local development
 
