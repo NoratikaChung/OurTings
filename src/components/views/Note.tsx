@@ -44,9 +44,11 @@ export function Note({
   /** How many of the newest bubbles fit: Infinity = all (with the "+N earlier" line), 0 = none (badge instead). */
   const [fit, setFit] = useState(Number.POSITIVE_INFINITY);
 
-  // Bubbles that don't fit stay laid out (hidden, out of flow, at the spot they would take), so the card can tell
-  // when it grows enough to show them again. Watching the list too catches its text reflowing (the web font
-  // arriving after the first check, a comment edited); the observer also fires once on start, before paint.
+  // Bubbles that don't fit stay laid out (hidden, out of flow), so the card can tell when it grows enough to show
+  // them again. Watching the list too catches its text reflowing (the web font arriving after the first check, a
+  // comment edited); the observer also fires once on start, before paint. The room is measured from the line above
+  // the list, not the list itself: taken out of flow, the list jumps to the card's top, which would read as room
+  // to show it, then not, flickering between bubbles and badge every frame.
   useLayoutEffect(() => {
     const el = card.current;
     const list = el?.querySelector<HTMLElement>('.note-comments');
@@ -54,7 +56,10 @@ export function Note({
     const observer = new ResizeObserver(() => {
       if (el.clientWidth < MIN_BUBBLE_WIDTH) return setFit(0);
       const gap = parseFloat(getComputedStyle(list).rowGap) || 0;
-      const room = el.clientHeight - parseFloat(getComputedStyle(el).paddingBottom) - list.offsetTop;
+      const above = list.previousElementSibling as HTMLElement;
+      const top =
+        above.offsetTop + above.offsetHeight + parseFloat(getComputedStyle(el).rowGap) + parseFloat(getComputedStyle(list).marginTop);
+      const room = el.clientHeight - parseFloat(getComputedStyle(el).paddingBottom) - top;
       const items = [...list.children].map((item) => (item as HTMLElement).offsetHeight);
       if (items.reduce((sum, h) => sum + h, 0) + gap * (items.length - 1) <= room) return setFit(Number.POSITIVE_INFINITY);
       const bubbles = [...list.querySelectorAll<HTMLElement>('.bubble')].reverse();
