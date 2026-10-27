@@ -52,6 +52,8 @@ The welcome page shows these steps too. Install, open the app from its icon, the
 - **Galaxy Tab S6 Lite** (Chrome): **⋮** → **Install and create shortcut** → **Install**.
 - **Laptop**: Chrome **⋮** → **Cast, save, and share** → **Install OurTings**; Edge **···** → **Apps** → **Install this site as an app**. Or just use the website.
 
+**Getting new versions.** Events and comments update live with no reload. A new app version (design or features) arrives like this: each time the installed app is opened or brought back to the screen it checks for one, and if there is one it reloads itself into it within a second or two. If it still looks old, close it fully (swipe it away) and open it again.
+
 ## Local development
 
 Node 24. `npm ci`, then:
