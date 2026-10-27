@@ -98,6 +98,12 @@ test('two devices share events and comments; prefs and login persist', async ({ 
   // Anant's own view is independent of Nora's toggles.
   await expect(other.getByRole('button', { name: /Picnic/ })).toBeVisible();
 
+  // The user menu closes when you tap anywhere else.
+  await page.getByRole('button', { name: 'Nora', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Log out' })).toBeVisible();
+  await page.locator('.agenda h2').click(); // on a phone the menu itself covers the view tabs
+  await expect(page.getByRole('button', { name: 'Log out' })).toHaveCount(0);
+
   // Explicit logout returns to the two icons; no code needed again.
   await page.getByRole('button', { name: 'Nora', exact: true }).click();
   await page.getByRole('button', { name: 'Log out' }).click();
@@ -129,7 +135,7 @@ test('welcome: butterfly reveals install steps and the whisper; × leads to the 
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await page.getByRole('button', { name: 'Install OurTings' }).click();
   const dialog = page.locator('.hk-dialog');
-  await expect(dialog).toContainText('Seek this bunny');
+  await expect(dialog).toContainText('seek this bunny');
   // Each device gets its own browser's install steps.
   const step: Record<string, string> = {
     iphone: '···', // Safari's page menu, only on iPhone

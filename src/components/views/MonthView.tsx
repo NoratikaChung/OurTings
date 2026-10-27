@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import {
   addDays,
   eachDayOfInterval,
@@ -17,6 +17,7 @@ import { occurrencesBetween, WEEK_STARTS_ON } from '../../lib/occurrences';
 import { Note, type ViewProps } from './Note';
 
 const MAX_MARKS = 3;
+const DOUBLE_TAP = 500; // ms; Windows' default double-click time
 
 export function MonthView({ events, comments, theme, cursor, onSelect, onOpen, onCreate, onOpenDay }: ViewProps & { onOpenDay: (d: Date) => void }) {
   const monthStart = startOfMonth(cursor).getTime();
@@ -34,6 +35,8 @@ export function MonthView({ events, comments, theme, cursor, onSelect, onOpen, o
   );
   const on = (d: Date) => occurrences.filter((o) => o.start < addDays(d, 1) && o.end > d);
   const selected = on(startOfDay(cursor));
+  // Touch double taps open the day; browsers don't reliably send `dblclick` for them (a mouse uses onDoubleClick).
+  const lastTap = useRef<{ day: number; at: number } | null>(null);
 
   return (
     <div className="month">
@@ -56,6 +59,14 @@ export function MonthView({ events, comments, theme, cursor, onSelect, onOpen, o
               aria-label={`${format(d, 'EEEE d MMMM')}${items.length ? `, ${items.length} events` : ''}`}
               onClick={() => onSelect(d)}
               onDoubleClick={() => onOpenDay(d)}
+              onPointerUp={(e) => {
+                if (e.pointerType === 'mouse') return;
+                const t = lastTap.current;
+                if (t && t.day === d.getTime() && e.timeStamp - t.at < DOUBLE_TAP) {
+                  lastTap.current = null;
+                  onOpenDay(d);
+                } else lastTap.current = { day: d.getTime(), at: e.timeStamp };
+              }}
             >
               <span className="day-num">{format(d, 'd')}</span>
               <span className="marks">

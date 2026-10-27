@@ -12,7 +12,7 @@ export interface ViewProps {
   cursor: Date;
   onSelect: (day: Date) => void;
   onOpen: (o: Occurrence) => void;
-  onCreate: (start: Date) => void;
+  onCreate: (start: Date, end?: Date) => void;
 }
 
 /** Narrower than this, a comment bubble can't show a readable line. */

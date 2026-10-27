@@ -6,8 +6,11 @@ import { parseLocal, toLocal } from '../lib/occurrences';
 import { REPEAT_NAMES, type CalendarEvent, type EventInput, type Repeat, type UserId } from '../types';
 import { Sheet } from './ui';
 
-/** New event at a moment (`timed` = an exact hour was picked), or an existing event. */
-export type EditorTarget = { start: Date; timed: boolean } | { event: CalendarEvent };
+/**
+ * New event at a moment (`timed` = an exact time was picked, `end` = a block was picked on the timetable; otherwise
+ * it lasts an hour), or an existing event.
+ */
+export type EditorTarget = { start: Date; end?: Date; timed: boolean } | { event: CalendarEvent };
 
 const REPEAT_CHOICES: { value: Repeat; label: string }[] = [
   { value: 'none', label: 'Once' },
@@ -34,7 +37,7 @@ function initial(target: EditorTarget, user: UserId): EventInput {
     description: '',
     place: '',
     start: toLocal(start),
-    end: toLocal(addHours(start, 1)),
+    end: toLocal(target.end ?? addHours(start, 1)),
     timeZone: '',
     allDay: false,
     kind: 'event',

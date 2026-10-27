@@ -232,12 +232,36 @@ h3 {
 }
 
 /* ---------- Calendar shell ---------- */
+/* The calendar fills the screen: the header and toolbar stay put and only the view below them scrolls. */
+.app:has(> .calendar) {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
 .calendar {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
   max-width: 1280px;
   margin: 0 auto;
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 10px;
-  padding-bottom: 88px;
+}
+.view {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+/* Month and year scroll as a whole only when they don't fit (year always, short screens for month). The
+   padding/negative margin pair keeps the cards' shadows from being clipped by the scroll edge. */
+.view-month,
+.view-year {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  margin: -10px -12px 0;
+  padding: 10px 12px 0;
 }
 .topbar {
   position: relative;
@@ -547,10 +571,14 @@ h3 {
 
 /* ---------- Month ---------- */
 .month {
-  display: grid;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
   gap: 10px;
 }
 .month-grid {
+  flex: none;
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   padding: 8px;
@@ -567,6 +595,7 @@ h3 {
   min-height: 54px;
   border-radius: 14px;
   padding: 4px 2px;
+  touch-action: manipulation; /* a double tap opens the day instead of zooming */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -612,7 +641,11 @@ h3 {
   color: var(--ink-soft);
   line-height: 7px;
 }
+/* As tall as its events, until it reaches the bottom of the screen; then it scrolls. */
 .agenda {
+  min-height: 120px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 14px;
   display: grid;
   gap: 8px;
@@ -634,8 +667,8 @@ h3 {
 /* One scroller holds the sticky date row and the hours, so every column lines up with its date. */
 .timetable {
   --gutter: 46px;
-  height: calc(100dvh - 230px);
-  min-height: 320px;
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
 }
@@ -720,6 +753,29 @@ h3 {
 .tt-col {
   position: relative;
   border-left: 1px solid var(--line);
+  /* A double tap creates an event (not a zoom); a long press picks time (no text selection or iOS callout). */
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+/* The half hours being picked, with their times, above any events underneath. */
+.tt-pick {
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  z-index: 1;
+  padding: 2px 6px;
+  border: 2px solid var(--accent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
 }
 .tt-col[data-today] {
   background-color: color-mix(in srgb, var(--today) 7%, transparent);
@@ -796,6 +852,7 @@ h3 {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 10px;
+  padding-bottom: 88px; /* the last months scroll clear of the + button */
 }
 .mini {
   padding: 10px;
@@ -1189,8 +1246,13 @@ h3 {
 
 @media (min-width: 1024px) {
   .month {
+    display: grid;
     grid-template-columns: 1fr 320px;
+    grid-template-rows: minmax(0, 1fr);
     align-items: start;
+  }
+  .agenda {
+    max-height: 100%;
   }
   .year {
     grid-template-columns: repeat(4, 1fr);
@@ -1284,6 +1346,15 @@ h3 {
   /* Transparent bunny: glow follows its outline instead of a box. */
   filter: drop-shadow(0 0 10px rgba(191, 230, 255, 0.45));
   animation: fade 0.6s;
+}
+.hk-outro {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+}
+.hk-untyped {
+  visibility: hidden;
 }
 /* Deliberately faint: attention belongs on the butterfly. */
 .hk-close {

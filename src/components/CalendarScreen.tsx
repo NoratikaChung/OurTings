@@ -80,7 +80,26 @@ export function CalendarScreen({
   const [editing, setEditing] = useState<EditorTarget | null>(null);
   const [viewing, setViewing] = useState<Occurrence | null>(null);
   const [menu, setMenu] = useState(false);
+  const me = useRef<HTMLDivElement>(null);
   const swipe = useRef<{ x: number; y: number } | null>(null);
+
+  // The user menu closes on a press anywhere outside it, or Esc. Capture phase: event cards stop their presses
+  // from bubbling.
+  useEffect(() => {
+    if (!menu) return;
+    const outside = (e: PointerEvent) => {
+      if (!me.current?.contains(e.target as Node)) setMenu(false);
+    };
+    const escape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMenu(false);
+    };
+    document.addEventListener('pointerdown', outside, true);
+    document.addEventListener('keydown', escape);
+    return () => {
+      document.removeEventListener('pointerdown', outside, true);
+      document.removeEventListener('keydown', escape);
+    };
+  }, [menu]);
 
   useEffect(() => subscribeEvents((e) => (setEvents(e), setError(null)), (e) => setError(e.message)), []);
   useEffect(() => subscribeCommentSummaries(setComments, (e) => setError(e.message)), []);
@@ -119,7 +138,7 @@ export function CalendarScreen({
   return (
     <main className="calendar">
       <header className="paper topbar">
-        <div className="me">
+        <div className="me" ref={me}>
           <button type="button" className="avatar-btn" onClick={() => setMenu(!menu)} aria-label={USER_NAMES[user]} aria-expanded={menu}>
             <Avatar user={user} theme={theme} size={40} />
           </button>
@@ -203,12 +222,12 @@ export function CalendarScreen({
               start: startOfWeek(cursor, { weekStartsOn: WEEK_STARTS_ON }),
               end: endOfWeek(cursor, { weekStartsOn: WEEK_STARTS_ON }),
             })}
-            onCreate={(start) => setEditing({ start, timed: true })}
+            onCreate={(start, end) => setEditing({ start, end, timed: true })}
             onOpenDay={openDay}
           />
         )}
         {view === 'day' && (
-          <Timetable {...viewProps} days={[startOfDay(cursor)]} onCreate={(start) => setEditing({ start, timed: true })} />
+          <Timetable {...viewProps} days={[startOfDay(cursor)]} onCreate={(start, end) => setEditing({ start, end, timed: true })} />
         )}
         {view === 'year' && <YearView {...viewProps} onOpenMonth={(d) => (setCursor(d), setView('month'))} />}
       </section>
