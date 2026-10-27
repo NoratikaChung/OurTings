@@ -798,8 +798,8 @@ h3 {
   -webkit-mask-image: linear-gradient(#000 calc(100% - 8px), transparent);
   mask-image: linear-gradient(#000 calc(100% - 8px), transparent);
 }
-/* Narrow columns (a phone's week): start time, title and the comment badge; the day view and wider screens show
-   the rest. The badge drops under the title here, as the corner would cover the time. */
+/* Narrow columns (a phone's week): start time, title, place and the comment badge; the day view and wider screens
+   show the rest. The badge drops under the title here, as the corner would cover the time. */
 @container (max-width: 90px) {
   .tt-event .note {
     padding: 3px 4px;
@@ -810,9 +810,18 @@ h3 {
   }
   .note-end,
   .tt-event .note-time svg,
-  .note-place,
+  .tt-event .note-place svg,
   .note-notes {
     display: none;
+  }
+  /* Up to two wrapped lines: one ellipsized line of a ~50 px column would show only a few letters. */
+  .tt-event .note-place {
+    font-size: 10px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
   }
   .tt-event .note-badge {
     position: relative;
