@@ -254,6 +254,14 @@ h3 {
   display: flex;
   flex-direction: column;
 }
+/* Sideways drags belong to the app (swipe to the next/previous day, week, month or year), not the browser: left to
+   it, the browser takes every drag as a possible scroll and cancels the touch before the swipe is seen. Set on every
+   element, as a scroll area inside (agenda, timetable, year) would otherwise let sideways drags through again. Not
+   `auto`, so a double tap opens the day / creates an event instead of zooming; pinch zoom still works. */
+.view,
+.view * {
+  touch-action: pan-y pinch-zoom;
+}
 /* Month and year scroll as a whole only when they don't fit (year always, short screens for month). The
    padding/negative margin pair keeps the cards' shadows from being clipped by the scroll edge. */
 .view-month,
@@ -595,7 +603,7 @@ h3 {
   min-height: 54px;
   border-radius: 14px;
   padding: 4px 2px;
-  touch-action: manipulation; /* a double tap opens the day instead of zooming */
+  /* No touch-action here: see `.view *` (a double tap opens the day instead of zooming). */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -753,8 +761,8 @@ h3 {
 .tt-col {
   position: relative;
   border-left: 1px solid var(--line);
-  /* A double tap creates an event (not a zoom); a long press picks time (no text selection or iOS callout). */
-  touch-action: manipulation;
+  /* A long press picks time (no text selection or iOS callout); a double tap creates an event (`.view *` stops the
+     zoom). */
   -webkit-user-select: none;
   user-select: none;
   -webkit-touch-callout: none;

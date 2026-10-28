@@ -213,6 +213,7 @@ export function CalendarScreen({
           const dx = e.clientX - s.x;
           if (Math.abs(dx) > 60 && Math.abs(e.clientY - s.y) < 40) go(dx < 0 ? 1 : -1);
         }}
+        onPointerCancel={() => (swipe.current = null)} // the browser took the touch for a vertical scroll
       >
         {view === 'month' && <MonthView {...viewProps} onOpenDay={openDay} />}
         {view === 'week' && (
